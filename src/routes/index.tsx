@@ -129,9 +129,9 @@ function HomePage() {
             {metrics.map((m) => (
               <div
                 key={m.label}
-                className="rounded-2xl border border-border bg-card p-6 text-center shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
+                className="flex flex-col-reverse rounded-2xl border border-border bg-card p-6 text-center shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
               >
-                <dt className="order-2 mt-1 text-xs text-muted-foreground sm:text-sm">{m.label}</dt>
+                <dt className="mt-1 text-xs text-muted-foreground sm:text-sm">{m.label}</dt>
                 <dd className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">{m.value}</dd>
               </div>
             ))}
