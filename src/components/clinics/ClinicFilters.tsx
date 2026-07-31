@@ -175,7 +175,7 @@ export function ClinicFilters({ filters, onChange, onReset, onApply, resultCount
         </Button>
       ) : (
         <p className="rounded-xl bg-secondary/70 px-3 py-2 text-center text-xs text-muted-foreground">
-          Showing {resultCount} of {DEFAULT_FILTERS ? "" : ""}matching clinics
+          {resultCount} clinics match your filters
         </p>
       )}
     </div>
