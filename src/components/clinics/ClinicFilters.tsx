@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  DEFAULT_FILTERS,
   FEATURES,
   TREATMENTS,
   citiesByState,
