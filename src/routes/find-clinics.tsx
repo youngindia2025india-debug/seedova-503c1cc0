@@ -221,7 +221,7 @@ function FindClinicsPage() {
           </aside>
 
           <section aria-labelledby="results-heading">
-            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex sm:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <h2 id="results-heading" className="truncate text-lg font-semibold tracking-tight">
                   {results.length} clinics {submitted ? `for “${submitted}”` : "available"}
@@ -231,7 +231,7 @@ function FindClinicsPage() {
                 </p>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
                 <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
                   <SheetTrigger asChild>
                     <Button variant="outline" className="h-11 rounded-xl lg:hidden">
