@@ -132,29 +132,27 @@ function FindClinicsPage() {
   const filterCount = activeFilterCount(filters);
 
   const toggleSave = (clinic: Clinic) => {
-    setSaved((prev) => {
-      const next = prev.includes(clinic.id)
-        ? prev.filter((id) => id !== clinic.id)
-        : [...prev, clinic.id];
-      toast.success(
-        prev.includes(clinic.id) ? `Removed ${clinic.name}` : `Saved ${clinic.name}`,
-        { description: prev.includes(clinic.id) ? undefined : "Find it later in your saved clinics." },
-      );
-      return next;
-    });
+    const isSaved = saved.includes(clinic.id);
+    setSaved(isSaved ? saved.filter((id) => id !== clinic.id) : [...saved, clinic.id]);
+    if (isSaved) toast.success(`Removed ${clinic.name}`);
+    else
+      toast.success(`Saved ${clinic.name}`, {
+        description: "Find it later in your saved clinics.",
+      });
   };
 
   const toggleCompare = (clinic: Clinic) => {
-    setCompare((prev) => {
-      if (prev.includes(clinic.id)) return prev.filter((id) => id !== clinic.id);
-      if (prev.length >= MAX_COMPARE) {
-        toast.warning("You can compare up to 3 clinics", {
-          description: "Remove one from the comparison bar to add another.",
-        });
-        return prev;
-      }
-      return [...prev, clinic.id];
-    });
+    if (compare.includes(clinic.id)) {
+      setCompare(compare.filter((id) => id !== clinic.id));
+      return;
+    }
+    if (compare.length >= MAX_COMPARE) {
+      toast.warning("You can compare up to 3 clinics", {
+        description: "Remove one from the comparison bar to add another.",
+      });
+      return;
+    }
+    setCompare([...compare, clinic.id]);
   };
 
   const resetFilters = () => {
