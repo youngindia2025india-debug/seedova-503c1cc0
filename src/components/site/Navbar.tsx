@@ -12,6 +12,7 @@ import { useAuth } from "@/lib/auth-context";
 
 const nav = [
   { to: "/", label: "Home" },
+  { to: "/find-clinics", label: "Find Clinics" },
   { to: "/community", label: "Community" },
 ];
 
