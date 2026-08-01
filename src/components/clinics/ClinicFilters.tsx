@@ -2,6 +2,7 @@ import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import {
   Select,
@@ -11,16 +12,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  FEATURES,
-  TREATMENTS,
-  citiesByState,
+  COST_CEILING,
+  COST_FLOOR,
+  RATING_STEPS,
+  citiesForState,
   formatCost,
-  states,
+  type ClinicFacets,
   type ClinicFilterState,
 } from "./data";
 
 type Props = {
   filters: ClinicFilterState;
+  facets: ClinicFacets;
+  facetsLoading?: boolean;
   onChange: (next: ClinicFilterState) => void;
   onReset: () => void;
   onApply?: () => void;
@@ -36,14 +40,65 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-export function ClinicFilters({ filters, onChange, onReset, onApply, resultCount }: Props) {
-  const toggle = (key: "treatments" | "features", value: string) => {
+function OptionList({
+  options,
+  selected,
+  loading,
+  emptyLabel,
+  onToggle,
+}: {
+  options: string[];
+  selected: string[];
+  loading?: boolean;
+  emptyLabel: string;
+  onToggle: (value: string) => void;
+}) {
+  if (loading) {
+    return (
+      <div className="space-y-2.5">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={i} className="h-5 w-2/3" />
+        ))}
+      </div>
+    );
+  }
+  if (options.length === 0) {
+    return <p className="text-xs text-muted-foreground">{emptyLabel}</p>;
+  }
+  return (
+    <div className="space-y-2.5">
+      {options.map((option) => (
+        <label key={option} className="flex cursor-pointer items-center gap-3 text-sm text-foreground">
+          <Checkbox
+            checked={selected.includes(option)}
+            onCheckedChange={() => onToggle(option)}
+            aria-label={option}
+          />
+          {option}
+        </label>
+      ))}
+    </div>
+  );
+}
+
+export function ClinicFilters({
+  filters,
+  facets,
+  facetsLoading = false,
+  onChange,
+  onReset,
+  onApply,
+  resultCount,
+}: Props) {
+  const toggle = (key: "treatments" | "facilities", value: string) => {
     const list = filters[key];
     onChange({
       ...filters,
       [key]: list.includes(value) ? list.filter((v) => v !== value) : [...list, value],
     });
   };
+
+  const cities = citiesForState(facets, filters.state);
 
   return (
     <div className="flex h-full flex-col gap-6">
@@ -63,13 +118,14 @@ export function ClinicFilters({ filters, onChange, onReset, onApply, resultCount
             <Select
               value={filters.state}
               onValueChange={(v) => onChange({ ...filters, state: v, city: "all" })}
+              disabled={facetsLoading || facets.states.length === 0}
             >
               <SelectTrigger id="filter-state" className="h-11 rounded-xl">
                 <SelectValue placeholder="State" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All states</SelectItem>
-                {states.map((s) => (
+                {facets.states.map((s) => (
                   <SelectItem key={s} value={s}>
                     {s}
                   </SelectItem>
@@ -80,13 +136,17 @@ export function ClinicFilters({ filters, onChange, onReset, onApply, resultCount
             <Label htmlFor="filter-city" className="sr-only">
               City
             </Label>
-            <Select value={filters.city} onValueChange={(v) => onChange({ ...filters, city: v })}>
+            <Select
+              value={filters.city}
+              onValueChange={(v) => onChange({ ...filters, city: v })}
+              disabled={facetsLoading || cities.length === 0}
+            >
               <SelectTrigger id="filter-city" className="h-11 rounded-xl">
                 <SelectValue placeholder="City" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All cities</SelectItem>
-                {citiesByState(filters.state).map((c) => (
+                {cities.map((c) => (
                   <SelectItem key={c} value={c}>
                     {c}
                   </SelectItem>
@@ -97,25 +157,20 @@ export function ClinicFilters({ filters, onChange, onReset, onApply, resultCount
         </Section>
 
         <Section title="Treatments">
-          <div className="space-y-2.5">
-            {TREATMENTS.map((t) => (
-              <label key={t} className="flex cursor-pointer items-center gap-3 text-sm text-foreground">
-                <Checkbox
-                  checked={filters.treatments.includes(t)}
-                  onCheckedChange={() => toggle("treatments", t)}
-                  aria-label={t}
-                />
-                {t}
-              </label>
-            ))}
-          </div>
+          <OptionList
+            options={facets.treatments}
+            selected={filters.treatments}
+            loading={facetsLoading}
+            emptyLabel="Treatments appear once clinics are listed."
+            onToggle={(v) => toggle("treatments", v)}
+          />
         </Section>
 
         <Section title={`Success rate — ${filters.minSuccess}%+`}>
           <Slider
             value={[filters.minSuccess]}
-            onValueChange={([v]) => onChange({ ...filters, minSuccess: v })}
-            max={70}
+            onValueChange={([v]) => onChange({ ...filters, minSuccess: v ?? 0 })}
+            max={100}
             step={5}
             aria-label="Minimum success rate"
           />
@@ -124,17 +179,17 @@ export function ClinicFilters({ filters, onChange, onReset, onApply, resultCount
         <Section title={`Treatment cost — up to ${formatCost(filters.maxCost)}`}>
           <Slider
             value={[filters.maxCost]}
-            onValueChange={([v]) => onChange({ ...filters, maxCost: v })}
-            min={100000}
-            max={400000}
-            step={10000}
+            onValueChange={([v]) => onChange({ ...filters, maxCost: v ?? COST_CEILING })}
+            min={COST_FLOOR}
+            max={COST_CEILING}
+            step={25000}
             aria-label="Maximum treatment cost"
           />
         </Section>
 
         <Section title="Clinic rating">
           <div className="flex flex-wrap gap-2">
-            {[0, 4, 4.3, 4.5].map((r) => (
+            {RATING_STEPS.map((r) => (
               <button
                 key={r}
                 type="button"
@@ -153,18 +208,13 @@ export function ClinicFilters({ filters, onChange, onReset, onApply, resultCount
         </Section>
 
         <Section title="Facilities">
-          <div className="space-y-2.5">
-            {FEATURES.map((f) => (
-              <label key={f} className="flex cursor-pointer items-center gap-3 text-sm text-foreground">
-                <Checkbox
-                  checked={filters.features.includes(f)}
-                  onCheckedChange={() => toggle("features", f)}
-                  aria-label={f}
-                />
-                {f}
-              </label>
-            ))}
-          </div>
+          <OptionList
+            options={facets.facilities}
+            selected={filters.facilities}
+            loading={facetsLoading}
+            emptyLabel="Facilities appear once clinics are listed."
+            onToggle={(v) => toggle("facilities", v)}
+          />
         </Section>
       </div>
 
