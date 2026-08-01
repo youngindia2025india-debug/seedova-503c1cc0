@@ -1,19 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Star, BadgeCheck, MapPin, IndianRupee, TrendingUp, MessageCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowRight,
+  Star,
+  BadgeCheck,
+  MapPin,
+  IndianRupee,
+  TrendingUp,
+  MessageCircle,
+  Building2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { EmptyState } from "@/components/common/EmptyState";
 import { SearchSection } from "@/components/landing/SearchSection";
-import {
-  metrics,
-  whySeedova,
-  steps,
-  featuredClinics,
-  stories,
-  communityQuestions,
-} from "@/components/landing/data";
+import { whySeedova, steps } from "@/components/landing/data";
+import { getLandingOverview } from "@/lib/landing.functions";
 import heroImage from "@/assets/hero-ivf.jpg";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
