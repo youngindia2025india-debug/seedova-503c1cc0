@@ -126,17 +126,24 @@ function HomePage() {
             Seedova in numbers
           </h2>
           <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {metrics.map((m) => (
+            {metricItems.map((m) => (
               <div
                 key={m.label}
                 className="flex flex-col-reverse rounded-2xl border border-border bg-card p-6 text-center shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
               >
                 <dt className="mt-1 text-xs text-muted-foreground sm:text-sm">{m.label}</dt>
-                <dd className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">{m.value}</dd>
+                <dd className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">
+                  {isPending ? (
+                    <Skeleton className="mx-auto h-8 w-16" />
+                  ) : (
+                    m.value.toLocaleString("en-IN")
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
         </section>
+
 
         {/* Why Seedova */}
         <section id="about" aria-labelledby="why-heading" className="bg-secondary/40 py-16 sm:py-24">
