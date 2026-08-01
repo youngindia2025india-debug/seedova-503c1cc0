@@ -118,12 +118,16 @@ export type Database = {
         Row: {
           address: string | null
           city: string
+          cost_max: number | null
+          cost_min: number | null
           country: string
           cover_image_url: string | null
           created_at: string
           description: string | null
           email: string | null
           established_year: number | null
+          facilities: string[]
+          highlights: string[]
           id: string
           is_published: boolean
           is_verified: boolean
@@ -136,18 +140,24 @@ export type Database = {
           review_count: number
           slug: string
           state: string | null
+          success_rate: number | null
+          treatments: string[]
           updated_at: string
           website: string | null
         }
         Insert: {
           address?: string | null
           city: string
+          cost_max?: number | null
+          cost_min?: number | null
           country?: string
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
           established_year?: number | null
+          facilities?: string[]
+          highlights?: string[]
           id?: string
           is_published?: boolean
           is_verified?: boolean
@@ -160,18 +170,24 @@ export type Database = {
           review_count?: number
           slug: string
           state?: string | null
+          success_rate?: number | null
+          treatments?: string[]
           updated_at?: string
           website?: string | null
         }
         Update: {
           address?: string | null
           city?: string
+          cost_max?: number | null
+          cost_min?: number | null
           country?: string
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
           email?: string | null
           established_year?: number | null
+          facilities?: string[]
+          highlights?: string[]
           id?: string
           is_published?: boolean
           is_verified?: boolean
@@ -184,6 +200,8 @@ export type Database = {
           review_count?: number
           slug?: string
           state?: string | null
+          success_rate?: number | null
+          treatments?: string[]
           updated_at?: string
           website?: string | null
         }

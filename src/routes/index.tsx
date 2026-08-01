@@ -1,19 +1,26 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Star, BadgeCheck, MapPin, IndianRupee, TrendingUp, MessageCircle } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  ArrowRight,
+  Star,
+  BadgeCheck,
+  MapPin,
+  IndianRupee,
+  TrendingUp,
+  MessageCircle,
+  Building2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
+import { EmptyState } from "@/components/common/EmptyState";
 import { SearchSection } from "@/components/landing/SearchSection";
-import {
-  metrics,
-  whySeedova,
-  steps,
-  featuredClinics,
-  stories,
-  communityQuestions,
-} from "@/components/landing/data";
+import { whySeedova, steps } from "@/components/landing/data";
+import { getLandingOverview } from "@/lib/landing.functions";
 import heroImage from "@/assets/hero-ivf.jpg";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -67,7 +74,24 @@ function Rating({ value }: { value: number }) {
 }
 
 function HomePage() {
+  const { data, isPending } = useQuery({
+    queryKey: ["landing-overview"],
+    queryFn: () => getLandingOverview(),
+  });
+
+  const stats = data?.stats;
+  const featured = data?.clinics ?? [];
+  const stories = data?.stories ?? [];
+  const questions = data?.questions ?? [];
+  const metricItems = [
+    { label: "Verified clinics", value: stats?.clinics ?? 0 },
+    { label: "Patient reviews", value: stats?.reviews ?? 0 },
+    { label: "Cities covered", value: stats?.cities ?? 0 },
+    { label: "Community members", value: stats?.members ?? 0 },
+  ];
+
   return (
+
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
       <main className="flex-1">
@@ -126,17 +150,24 @@ function HomePage() {
             Seedova in numbers
           </h2>
           <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {metrics.map((m) => (
+            {metricItems.map((m) => (
               <div
                 key={m.label}
                 className="flex flex-col-reverse rounded-2xl border border-border bg-card p-6 text-center shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
               >
                 <dt className="mt-1 text-xs text-muted-foreground sm:text-sm">{m.label}</dt>
-                <dd className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">{m.value}</dd>
+                <dd className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">
+                  {isPending ? (
+                    <Skeleton className="mx-auto h-8 w-16" />
+                  ) : (
+                    m.value.toLocaleString("en-IN")
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
         </section>
+
 
         {/* Why Seedova */}
         <section id="about" aria-labelledby="why-heading" className="bg-secondary/40 py-16 sm:py-24">
@@ -194,60 +225,86 @@ function HomePage() {
               Featured IVF clinics
             </h2>
             <p className="mt-3 max-w-2xl text-muted-foreground">
-              Sample listings showing the information you'll see on every clinic profile.
+              Verified listings with cost ranges, success rates and patient ratings.
             </p>
-            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {featuredClinics.map((c) => (
-                <article
-                  key={c.name}
-                  className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
-                >
-                  <div
-                    className="grid h-36 place-items-center"
-                    style={{ background: "var(--gradient-primary)" }}
-                    aria-hidden="true"
+            {isPending ? (
+              <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[24rem] rounded-2xl" />
+                ))}
+              </div>
+            ) : featured.length === 0 ? (
+              <div className="mt-10">
+                <EmptyState
+                  icon={Building2}
+                  title="Clinic listings are on the way"
+                  description="We're verifying IVF clinics across India. Listings will appear here as soon as they're published."
+                  action={
+                    <Button asChild>
+                      <Link to="/find-clinics">Open clinic search</Link>
+                    </Button>
+                  }
+                />
+              </div>
+            ) : (
+              <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {featured.map((c) => (
+                  <article
+                    key={c.id}
+                    className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
                   >
-                    <span className="text-3xl font-semibold text-primary-foreground/90">
-                      {c.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 flex-col p-6">
-                    <h3 className="text-base font-semibold text-foreground">{c.name}</h3>
-                    <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> {c.city}
-                    </p>
-                    <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-                      <div className="rounded-xl bg-secondary px-3 py-2">
-                        <p className="flex items-center gap-1 text-muted-foreground">
-                          <IndianRupee className="h-3 w-3" aria-hidden="true" /> Est. cost
-                        </p>
-                        <p className="mt-0.5 font-semibold text-foreground">{c.cost}</p>
-                      </div>
-                      <div className="rounded-xl bg-secondary px-3 py-2">
-                        <p className="flex items-center gap-1 text-muted-foreground">
-                          <TrendingUp className="h-3 w-3" aria-hidden="true" /> Success rate
-                        </p>
-                        <p className="mt-0.5 font-semibold text-foreground">{c.success}</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex items-center gap-2">
-                      <Rating value={c.rating} />
-                      <span className="text-xs text-muted-foreground">
-                        {c.rating} · {c.reviews} reviews
+                    <div
+                      className="grid h-36 place-items-center"
+                      style={{ background: "var(--gradient-primary)" }}
+                      aria-hidden="true"
+                    >
+                      <span className="text-3xl font-semibold text-primary-foreground/90">
+                        {c.name.charAt(0)}
                       </span>
                     </div>
-                    <p className="mt-3 text-sm text-muted-foreground">{c.description}</p>
-                    <Button asChild variant="outline" className="mt-5 w-full">
-                      <a href="#find-clinics" aria-label={`View details for ${c.name}`}>
-                        View Details
-                      </a>
-                    </Button>
-                  </div>
-                </article>
-              ))}
-            </div>
+                    <div className="flex flex-1 flex-col p-6">
+                      <h3 className="text-base font-semibold text-foreground">{c.name}</h3>
+                      {c.location ? (
+                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> {c.location}
+                        </p>
+                      ) : null}
+                      <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                        <div className="rounded-xl bg-secondary px-3 py-2">
+                          <p className="flex items-center gap-1 text-muted-foreground">
+                            <IndianRupee className="h-3 w-3" aria-hidden="true" /> Est. cost
+                          </p>
+                          <p className="mt-0.5 font-semibold text-foreground">{c.costLabel}</p>
+                        </div>
+                        <div className="rounded-xl bg-secondary px-3 py-2">
+                          <p className="flex items-center gap-1 text-muted-foreground">
+                            <TrendingUp className="h-3 w-3" aria-hidden="true" /> Success rate
+                          </p>
+                          <p className="mt-0.5 font-semibold text-foreground">{c.successLabel}</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex items-center gap-2">
+                        <Rating value={c.rating} />
+                        <span className="text-xs text-muted-foreground">
+                          {c.reviews > 0 ? `${c.rating.toFixed(1)} · ${c.reviews} reviews` : "No reviews yet"}
+                        </span>
+                      </div>
+                      {c.description ? (
+                        <p className="mt-3 text-sm text-muted-foreground">{c.description}</p>
+                      ) : null}
+                      <Button asChild variant="outline" className="mt-5 w-full">
+                        <Link to="/find-clinics" aria-label={`View details for ${c.name}`}>
+                          View Details
+                        </Link>
+                      </Button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         </section>
+
 
         {/* Patient stories */}
         <section aria-labelledby="stories-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
@@ -255,33 +312,50 @@ function HomePage() {
             Anonymous patient stories
           </h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Real-world style experiences shared without names, photos or identities.
+            Experiences shared without names, photos or identities.
           </p>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {stories.map((s) => (
-              <figure
-                key={s.text}
-                className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">{s.handle}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {s.treatment} · {s.city}
-                    </p>
+          {isPending ? (
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-48 rounded-2xl" />
+              ))}
+            </div>
+          ) : stories.length === 0 ? (
+            <div className="mt-10">
+              <EmptyState
+                icon={MessageCircle}
+                title="No patient stories yet"
+                description="Verified, anonymous reviews will appear here as patients share their treatment journeys."
+              />
+            </div>
+          ) : (
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {stories.map((s) => (
+                <figure
+                  key={s.id}
+                  className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-foreground">{s.handle}</p>
+                      {s.context ? (
+                        <p className="truncate text-xs text-muted-foreground">{s.context}</p>
+                      ) : null}
+                    </div>
+                    <Badge variant="secondary" className="shrink-0 gap-1">
+                      <BadgeCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> Verified
+                    </Badge>
                   </div>
-                  <Badge variant="secondary" className="shrink-0 gap-1">
-                    <BadgeCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> Verified
-                  </Badge>
-                </div>
-                <div className="mt-3">
-                  <Rating value={s.rating} />
-                </div>
-                <blockquote className="mt-3 flex-1 text-sm text-muted-foreground">“{s.text}”</blockquote>
-              </figure>
-            ))}
-          </div>
+                  <div className="mt-3">
+                    <Rating value={s.rating} />
+                  </div>
+                  <blockquote className="mt-3 flex-1 text-sm text-muted-foreground">“{s.text}”</blockquote>
+                </figure>
+              ))}
+            </div>
+          )}
         </section>
+
 
         {/* Community preview */}
         <section aria-labelledby="community-heading" className="bg-secondary/40 py-16 sm:py-24">
@@ -290,24 +364,42 @@ function HomePage() {
               From the community
             </h2>
             <p className="mt-3 text-muted-foreground">Latest anonymous questions from patients like you.</p>
-            <ul className="mt-8 space-y-3">
-              {communityQuestions.map((q) => (
-                <li key={q.q}>
-                  <Link
-                    to="/community"
-                    className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-colors hover:bg-card/80"
-                  >
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium text-foreground">{q.q}</span>
-                      <span className="mt-1 block text-xs text-muted-foreground">
-                        {q.tag} · {q.answers} answers
+            {isPending ? (
+              <ul className="mt-8 space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <li key={i}>
+                    <Skeleton className="h-[4.5rem] w-full rounded-2xl" />
+                  </li>
+                ))}
+              </ul>
+            ) : questions.length === 0 ? (
+              <div className="mt-8">
+                <EmptyState
+                  icon={MessageCircle}
+                  title="No questions yet"
+                  description="Be the first to ask something anonymously — the community is just getting started."
+                />
+              </div>
+            ) : (
+              <ul className="mt-8 space-y-3">
+                {questions.map((q) => (
+                  <li key={q.id}>
+                    <Link
+                      to="/community"
+                      className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-colors hover:bg-card/80"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-medium text-foreground">{q.title}</span>
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {q.tag} · {q.answers} answers
+                        </span>
                       </span>
-                    </span>
-                    <MessageCircle className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                      <MessageCircle className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="mt-8">
               <Button asChild size="lg">
                 <Link to="/community">View Community</Link>
@@ -315,6 +407,7 @@ function HomePage() {
             </div>
           </div>
         </section>
+
 
         {/* CTA */}
         <section aria-labelledby="cta-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">

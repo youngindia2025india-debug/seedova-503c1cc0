@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Clock, Mic, Search, X } from "lucide-react";
+import { Clock, Loader2, Mic, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { clinics } from "./data";
 
 const RECENT_KEY = "seedova.recent-clinic-searches";
 
@@ -11,11 +10,15 @@ export function ClinicSearchBar({
   query,
   onQueryChange,
   onSubmit,
+  suggestions = [],
+  suggestionsLoading = false,
   sticky = false,
 }: {
   query: string;
   onQueryChange: (value: string) => void;
   onSubmit: (value: string) => void;
+  suggestions?: string[];
+  suggestionsLoading?: boolean;
   sticky?: boolean;
 }) {
   const [open, setOpen] = useState(false);
@@ -54,16 +57,8 @@ export function ClinicSearchBar({
     }
   };
 
-  const q = query.trim().toLowerCase();
-  const suggestions = q
-    ? Array.from(
-        new Set(
-          clinics
-            .flatMap((c) => [c.name, c.city, c.state])
-            .filter((s) => s.toLowerCase().includes(q)),
-        ),
-      ).slice(0, 6)
-    : [];
+  const hasQuery = query.trim().length > 0;
+  const showPanel = open && (hasQuery ? suggestions.length > 0 || suggestionsLoading : recent.length > 0);
 
   return (
     <div ref={wrapRef} className="relative">
@@ -88,8 +83,8 @@ export function ClinicSearchBar({
               onQueryChange(e.target.value);
               setOpen(true);
             }}
-            aria-label="Search clinics by name, city or state"
-            placeholder="Search clinic, city or state"
+            aria-label="Search clinics by name, city or treatment"
+            placeholder="Search clinic, city or treatment"
             className={`rounded-2xl border-0 bg-transparent pl-11 pr-9 shadow-none focus-visible:ring-0 ${
               sticky ? "h-11 text-sm" : "h-14 text-base"
             }`}
@@ -123,23 +118,29 @@ export function ClinicSearchBar({
         </Button>
       </form>
 
-      {open && (suggestions.length > 0 || recent.length > 0) ? (
+      {showPanel ? (
         <div className="absolute inset-x-0 top-[calc(100%+0.5rem)] z-50 overflow-hidden rounded-2xl border border-border/70 bg-popover p-2 shadow-[0_18px_50px_-18px_oklch(0.4_0.06_175_/_0.35)]">
-          {suggestions.length > 0 ? (
-            <ul className="space-y-0.5">
-              {suggestions.map((s) => (
-                <li key={s}>
-                  <button
-                    type="button"
-                    onClick={() => commit(s)}
-                    className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-popover-foreground transition-colors hover:bg-secondary"
-                  >
-                    <Search className="h-3.5 w-3.5 text-muted-foreground" />
-                    {s}
-                  </button>
-                </li>
-              ))}
-            </ul>
+          {hasQuery ? (
+            suggestionsLoading && suggestions.length === 0 ? (
+              <p className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Searching…
+              </p>
+            ) : (
+              <ul className="space-y-0.5">
+                {suggestions.map((s) => (
+                  <li key={s}>
+                    <button
+                      type="button"
+                      onClick={() => commit(s)}
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm text-popover-foreground transition-colors hover:bg-secondary"
+                    >
+                      <Search className="h-3.5 w-3.5 text-muted-foreground" />
+                      {s}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )
           ) : (
             <div>
               <p className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
