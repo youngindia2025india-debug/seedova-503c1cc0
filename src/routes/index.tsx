@@ -67,7 +67,24 @@ function Rating({ value }: { value: number }) {
 }
 
 function HomePage() {
+  const { data, isPending } = useQuery({
+    queryKey: ["landing-overview"],
+    queryFn: () => getLandingOverview(),
+  });
+
+  const stats = data?.stats;
+  const featured = data?.clinics ?? [];
+  const stories = data?.stories ?? [];
+  const questions = data?.questions ?? [];
+  const metricItems = [
+    { label: "Verified clinics", value: stats?.clinics ?? 0 },
+    { label: "Patient reviews", value: stats?.reviews ?? 0 },
+    { label: "Cities covered", value: stats?.cities ?? 0 },
+    { label: "Community members", value: stats?.members ?? 0 },
+  ];
+
   return (
+
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
       <main className="flex-1">
