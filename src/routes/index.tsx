@@ -194,60 +194,86 @@ function HomePage() {
               Featured IVF clinics
             </h2>
             <p className="mt-3 max-w-2xl text-muted-foreground">
-              Sample listings showing the information you'll see on every clinic profile.
+              Verified listings with cost ranges, success rates and patient ratings.
             </p>
-            <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {featuredClinics.map((c) => (
-                <article
-                  key={c.name}
-                  className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
-                >
-                  <div
-                    className="grid h-36 place-items-center"
-                    style={{ background: "var(--gradient-primary)" }}
-                    aria-hidden="true"
+            {isPending ? (
+              <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-[24rem] rounded-2xl" />
+                ))}
+              </div>
+            ) : featured.length === 0 ? (
+              <div className="mt-10">
+                <EmptyState
+                  icon={Building2}
+                  title="Clinic listings are on the way"
+                  description="We're verifying IVF clinics across India. Listings will appear here as soon as they're published."
+                  action={
+                    <Button asChild>
+                      <Link to="/find-clinics">Open clinic search</Link>
+                    </Button>
+                  }
+                />
+              </div>
+            ) : (
+              <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {featured.map((c) => (
+                  <article
+                    key={c.id}
+                    className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
                   >
-                    <span className="text-3xl font-semibold text-primary-foreground/90">
-                      {c.name.charAt(0)}
-                    </span>
-                  </div>
-                  <div className="flex flex-1 flex-col p-6">
-                    <h3 className="text-base font-semibold text-foreground">{c.name}</h3>
-                    <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                      <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> {c.city}
-                    </p>
-                    <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-                      <div className="rounded-xl bg-secondary px-3 py-2">
-                        <p className="flex items-center gap-1 text-muted-foreground">
-                          <IndianRupee className="h-3 w-3" aria-hidden="true" /> Est. cost
-                        </p>
-                        <p className="mt-0.5 font-semibold text-foreground">{c.cost}</p>
-                      </div>
-                      <div className="rounded-xl bg-secondary px-3 py-2">
-                        <p className="flex items-center gap-1 text-muted-foreground">
-                          <TrendingUp className="h-3 w-3" aria-hidden="true" /> Success rate
-                        </p>
-                        <p className="mt-0.5 font-semibold text-foreground">{c.success}</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 flex items-center gap-2">
-                      <Rating value={c.rating} />
-                      <span className="text-xs text-muted-foreground">
-                        {c.rating} · {c.reviews} reviews
+                    <div
+                      className="grid h-36 place-items-center"
+                      style={{ background: "var(--gradient-primary)" }}
+                      aria-hidden="true"
+                    >
+                      <span className="text-3xl font-semibold text-primary-foreground/90">
+                        {c.name.charAt(0)}
                       </span>
                     </div>
-                    <p className="mt-3 text-sm text-muted-foreground">{c.description}</p>
-                    <Button asChild variant="outline" className="mt-5 w-full">
-                      <a href="#find-clinics" aria-label={`View details for ${c.name}`}>
-                        View Details
-                      </a>
-                    </Button>
-                  </div>
-                </article>
-              ))}
-            </div>
+                    <div className="flex flex-1 flex-col p-6">
+                      <h3 className="text-base font-semibold text-foreground">{c.name}</h3>
+                      {c.location ? (
+                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> {c.location}
+                        </p>
+                      ) : null}
+                      <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
+                        <div className="rounded-xl bg-secondary px-3 py-2">
+                          <p className="flex items-center gap-1 text-muted-foreground">
+                            <IndianRupee className="h-3 w-3" aria-hidden="true" /> Est. cost
+                          </p>
+                          <p className="mt-0.5 font-semibold text-foreground">{c.costLabel}</p>
+                        </div>
+                        <div className="rounded-xl bg-secondary px-3 py-2">
+                          <p className="flex items-center gap-1 text-muted-foreground">
+                            <TrendingUp className="h-3 w-3" aria-hidden="true" /> Success rate
+                          </p>
+                          <p className="mt-0.5 font-semibold text-foreground">{c.successLabel}</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex items-center gap-2">
+                        <Rating value={c.rating} />
+                        <span className="text-xs text-muted-foreground">
+                          {c.reviews > 0 ? `${c.rating.toFixed(1)} · ${c.reviews} reviews` : "No reviews yet"}
+                        </span>
+                      </div>
+                      {c.description ? (
+                        <p className="mt-3 text-sm text-muted-foreground">{c.description}</p>
+                      ) : null}
+                      <Button asChild variant="outline" className="mt-5 w-full">
+                        <Link to="/find-clinics" aria-label={`View details for ${c.name}`}>
+                          View Details
+                        </Link>
+                      </Button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </div>
         </section>
+
 
         {/* Patient stories */}
         <section aria-labelledby="stories-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
