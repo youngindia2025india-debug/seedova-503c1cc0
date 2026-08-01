@@ -255,33 +255,50 @@ function HomePage() {
             Anonymous patient stories
           </h2>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Real-world style experiences shared without names, photos or identities.
+            Experiences shared without names, photos or identities.
           </p>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {stories.map((s) => (
-              <figure
-                key={s.text}
-                className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">{s.handle}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {s.treatment} · {s.city}
-                    </p>
+          {isPending ? (
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-48 rounded-2xl" />
+              ))}
+            </div>
+          ) : stories.length === 0 ? (
+            <div className="mt-10">
+              <EmptyState
+                icon={MessageCircle}
+                title="No patient stories yet"
+                description="Verified, anonymous reviews will appear here as patients share their treatment journeys."
+              />
+            </div>
+          ) : (
+            <div className="mt-10 grid gap-6 md:grid-cols-3">
+              {stories.map((s) => (
+                <figure
+                  key={s.id}
+                  className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-foreground">{s.handle}</p>
+                      {s.context ? (
+                        <p className="truncate text-xs text-muted-foreground">{s.context}</p>
+                      ) : null}
+                    </div>
+                    <Badge variant="secondary" className="shrink-0 gap-1">
+                      <BadgeCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> Verified
+                    </Badge>
                   </div>
-                  <Badge variant="secondary" className="shrink-0 gap-1">
-                    <BadgeCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> Verified
-                  </Badge>
-                </div>
-                <div className="mt-3">
-                  <Rating value={s.rating} />
-                </div>
-                <blockquote className="mt-3 flex-1 text-sm text-muted-foreground">“{s.text}”</blockquote>
-              </figure>
-            ))}
-          </div>
+                  <div className="mt-3">
+                    <Rating value={s.rating} />
+                  </div>
+                  <blockquote className="mt-3 flex-1 text-sm text-muted-foreground">“{s.text}”</blockquote>
+                </figure>
+              ))}
+            </div>
+          )}
         </section>
+
 
         {/* Community preview */}
         <section aria-labelledby="community-heading" className="bg-secondary/40 py-16 sm:py-24">
