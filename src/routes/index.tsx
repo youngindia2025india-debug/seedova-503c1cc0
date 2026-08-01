@@ -290,24 +290,42 @@ function HomePage() {
               From the community
             </h2>
             <p className="mt-3 text-muted-foreground">Latest anonymous questions from patients like you.</p>
-            <ul className="mt-8 space-y-3">
-              {communityQuestions.map((q) => (
-                <li key={q.q}>
-                  <Link
-                    to="/community"
-                    className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-colors hover:bg-card/80"
-                  >
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-medium text-foreground">{q.q}</span>
-                      <span className="mt-1 block text-xs text-muted-foreground">
-                        {q.tag} · {q.answers} answers
+            {isPending ? (
+              <ul className="mt-8 space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <li key={i}>
+                    <Skeleton className="h-[4.5rem] w-full rounded-2xl" />
+                  </li>
+                ))}
+              </ul>
+            ) : questions.length === 0 ? (
+              <div className="mt-8">
+                <EmptyState
+                  icon={MessageCircle}
+                  title="No questions yet"
+                  description="Be the first to ask something anonymously — the community is just getting started."
+                />
+              </div>
+            ) : (
+              <ul className="mt-8 space-y-3">
+                {questions.map((q) => (
+                  <li key={q.id}>
+                    <Link
+                      to="/community"
+                      className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-colors hover:bg-card/80"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-medium text-foreground">{q.title}</span>
+                        <span className="mt-1 block text-xs text-muted-foreground">
+                          {q.tag} · {q.answers} answers
+                        </span>
                       </span>
-                    </span>
-                    <MessageCircle className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+                      <MessageCircle className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="mt-8">
               <Button asChild size="lg">
                 <Link to="/community">View Community</Link>
@@ -315,6 +333,7 @@ function HomePage() {
             </div>
           </div>
         </section>
+
 
         {/* CTA */}
         <section aria-labelledby="cta-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
