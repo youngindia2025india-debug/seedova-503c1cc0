@@ -10,14 +10,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export const metrics = [
-  { label: "IVF Clinics", value: "1,200+" },
-  { label: "Anonymous Reviews", value: "18,400+" },
-  { label: "Community Members", value: "46,000+" },
-  { label: "Cities Covered", value: "120+" },
-];
-
 export const whySeedova: { icon: LucideIcon; title: string; body: string }[] = [
+
   {
     icon: ShieldCheck,
     title: "Transparent Clinic Information",
