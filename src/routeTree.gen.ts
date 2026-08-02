@@ -21,6 +21,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminReviewsRouteImport } from './routes/admin/reviews'
+import { Route as AdminImportRouteImport } from './routes/admin/import'
 import { Route as AdminCommunityRouteImport } from './routes/admin/community'
 import { Route as AdminClinicsRouteImport } from './routes/admin/clinics'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
@@ -90,6 +91,11 @@ const AdminReviewsRoute = AdminReviewsRouteImport.update({
   path: '/reviews',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminImportRoute = AdminImportRouteImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminCommunityRoute = AdminCommunityRouteImport.update({
   id: '/community',
   path: '/community',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
@@ -175,6 +182,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin': typeof AdminIndexRoute
@@ -199,6 +207,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/': typeof AdminIndexRoute
@@ -223,6 +232,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
+    | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
     | '/admin/'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
+    | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
     | '/admin'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
+    | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
     | '/admin/'
@@ -377,6 +389,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReviewsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/import': {
+      id: '/admin/import'
+      path: '/import'
+      fullPath: '/admin/import'
+      preLoaderRoute: typeof AdminImportRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/community': {
       id: '/admin/community'
       path: '/community'
@@ -471,6 +490,7 @@ const AuthenticatedRouteRouteWithChildren =
 interface AdminRouteRouteChildren {
   AdminClinicsRoute: typeof AdminClinicsRoute
   AdminCommunityRoute: typeof AdminCommunityRoute
+  AdminImportRoute: typeof AdminImportRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -479,6 +499,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminClinicsRoute: AdminClinicsRoute,
   AdminCommunityRoute: AdminCommunityRoute,
+  AdminImportRoute: AdminImportRoute,
   AdminReviewsRoute: AdminReviewsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
