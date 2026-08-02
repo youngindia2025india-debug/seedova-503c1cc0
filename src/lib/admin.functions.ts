@@ -400,8 +400,9 @@ export const adminAnalytics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<AdminAnalytics> => {
     await assertAdmin(context);
+    const db = context.supabase as any;
     const count = async (table: string, apply?: (q: any) => any) => {
-      let q = context.supabase.from(table).select("id", { count: "exact", head: true });
+      let q = db.from(table).select("id", { count: "exact", head: true });
       if (apply) q = apply(q);
       const { count: c, error } = await q;
       if (error) throw new Error(error.message);
