@@ -1,438 +1,428 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowRight,
-  Star,
   BadgeCheck,
-  MapPin,
-  IndianRupee,
-  TrendingUp,
-  MessageCircle,
-  Building2,
+  GitCompare,
+  Lock,
+  MessageCircleQuestion,
+  MessagesSquare,
+  Quote,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { EmptyState } from "@/components/common/EmptyState";
-import { SearchSection } from "@/components/landing/SearchSection";
-import { whySeedova, steps } from "@/components/landing/data";
+import { ClinicCard } from "@/components/clinics/ClinicCard";
+import { ClinicCardSkeleton } from "@/components/clinics/ClinicCardSkeleton";
+import { getClinicFacets, searchClinics } from "@/lib/clinics.functions";
 import { getLandingOverview } from "@/lib/landing.functions";
-import heroImage from "@/assets/hero-ivf.jpg";
+import { journeySteps, trustStrip } from "@/components/landing/data";
+import heroCouple from "@/assets/hero-couple.jpg.asset.json";
 
+const TITLE = "Seedova — Find the IVF clinic that's right for you";
+const DESCRIPTION =
+  "Search verified IVF clinics across India, compare the information that matters and learn from anonymous patient experiences before you decide.";
+const URL = "https://seedova.lovable.app/";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Seedova — Find the Right IVF Clinic with Confidence" },
-      {
-        name: "description",
-        content:
-          "Compare IVF clinics across India, explore transparent treatment costs and success rates, and learn from anonymous patient experiences.",
-      },
-      { property: "og:title", content: "Seedova — Find the Right IVF Clinic with Confidence" },
-      {
-        property: "og:description",
-        content:
-          "Compare IVF clinics across India, explore transparent treatment information and read anonymous patient experiences.",
-      },
+      { title: TITLE },
+      { name: "description", content: DESCRIPTION },
+      { property: "og:title", content: TITLE },
+      { property: "og:description", content: DESCRIPTION },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: "https://seedova.lovable.app/" },
+      { property: "og:url", content: URL },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: "https://seedova.lovable.app/" }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: "Seedova",
-          url: "https://seedova.lovable.app/",
-          description:
-            "Discover and compare IVF clinics in India with transparent information and anonymous patient experiences.",
-        }),
-      },
-    ],
+    links: [{ rel: "canonical", href: URL }],
   }),
   component: HomePage,
 });
 
-function Rating({ value }: { value: number }) {
-  return (
-    <span className="inline-flex items-center gap-1" aria-label={`Rated ${value} out of 5`}>
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Star
-          key={i}
-          aria-hidden="true"
-          className={`h-3.5 w-3.5 ${i <= Math.round(value) ? "fill-accent text-accent" : "text-border"}`}
-        />
-      ))}
-    </span>
-  );
-}
-
 function HomePage() {
-  const { data, isPending } = useQuery({
-    queryKey: ["landing-overview"],
-    queryFn: () => getLandingOverview(),
-  });
+  const navigate = useNavigate();
+  const overviewFn = useServerFn(getLandingOverview);
+  const clinicsFn = useServerFn(searchClinics);
+  const facetsFn = useServerFn(getClinicFacets);
+  const [query, setQuery] = useState("");
 
-  const stats = data?.stats;
-  const featured = data?.clinics ?? [];
-  const stories = data?.stories ?? [];
-  const questions = data?.questions ?? [];
-  const metricItems = [
-    { label: "Verified clinics", value: stats?.clinics ?? 0 },
-    { label: "Patient reviews", value: stats?.reviews ?? 0 },
-    { label: "Cities covered", value: stats?.cities ?? 0 },
-    { label: "Community members", value: stats?.members ?? 0 },
-  ];
+  const overview = useQuery({ queryKey: ["landing-overview"], queryFn: () => overviewFn() });
+  const clinics = useQuery({
+    queryKey: ["landing-clinics"],
+    queryFn: () => clinicsFn({ data: { page: 1, pageSize: 3, sort: "rating" } }),
+  });
+  const facets = useQuery({ queryKey: ["landing-facets"], queryFn: () => facetsFn() });
+
+  const popular = (facets.data?.cities ?? []).slice(0, 5);
+
+  const goSearch = (value: string) => {
+    const q = value.trim();
+    navigate({ to: "/find-clinics", search: q ? { q } : {} });
+  };
 
   return (
-
     <div className="flex min-h-screen flex-col bg-background">
       <Navbar />
+
       <main className="flex-1">
-        {/* Hero */}
-        <section aria-labelledby="hero-heading" className="relative overflow-hidden">
+        {/* ---------------- HERO ---------------- */}
+        <section className="relative overflow-hidden">
           <div
-            className="absolute inset-0 -z-10 opacity-70"
-            style={{
-              background:
-                "radial-gradient(1100px 420px at 50% -120px, oklch(0.95 0.03 175 / 0.9), transparent 70%)",
-            }}
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(80%_60%_at_85%_0%,var(--brand-purple-soft),transparent_60%)]"
           />
-          <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 pt-16 pb-14 sm:px-6 sm:pt-24 lg:grid-cols-2">
-            <div className="animate-fade-in text-center lg:text-left">
-              <span className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-secondary-foreground">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" /> India's trusted IVF community
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 pb-12 pt-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:pb-20 lg:pt-20">
+            <div className="animate-fade-in">
+              <span className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-card px-4 py-1.5 text-xs font-medium tracking-wide text-secondary-foreground shadow-[var(--shadow-soft)]">
+                <ShieldCheck className="h-3.5 w-3.5 text-primary" aria-hidden />
+                Trusted. Verified. Patient-first.
               </span>
-              <h1
-                id="hero-heading"
-                className="mt-6 text-balance text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
-              >
-                Find the Right IVF Clinic with Confidence
+
+              <h1 className="mt-6 text-balance font-[family-name:var(--font-display)] text-[2.75rem] leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-[4.25rem]">
+                Find the IVF clinic{" "}
+                <span className="text-[color:var(--brand-purple)]">that's right for you.</span>
               </h1>
-              <p className="mx-auto mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg lg:mx-0">
-                Compare IVF clinics, explore transparent treatment information, and learn from
-                anonymous patient experiences.
+
+              <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+                Search verified clinics, compare your options, and learn from anonymous patient
+                experiences.
               </p>
-              <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-                <Button asChild size="lg" className="transition-transform hover:-translate-y-0.5">
-                  <a href="#find-clinics">
-                    Explore Clinics <ArrowRight className="ml-1 h-4 w-4" />
-                  </a>
+
+              <form
+                role="search"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  goSearch(query);
+                }}
+                className="mt-8 flex items-center gap-2 rounded-[22px] border border-border/70 bg-card p-2 shadow-[var(--shadow-soft)] transition-shadow focus-within:shadow-[0_18px_50px_-20px_oklch(0.45_0.19_295_/_0.35)]"
+              >
+                <div className="relative min-w-0 flex-1">
+                  <Search
+                    aria-hidden
+                    className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                  />
+                  <Input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    aria-label="Search by clinic, city or treatment"
+                    placeholder="Search by clinic, city or treatment"
+                    className="h-12 rounded-2xl border-0 bg-transparent pl-11 text-base shadow-none focus-visible:ring-0 sm:h-14"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="h-12 shrink-0 rounded-2xl px-6 transition-transform hover:-translate-y-0.5 sm:h-14"
+                >
+                  <Search className="h-4 w-4 sm:hidden" aria-hidden />
+                  <span className="hidden sm:inline">Search</span>
+                  <span className="sr-only sm:hidden">Search</span>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="transition-transform hover:-translate-y-0.5">
-                  <Link to="/community">Join Community</Link>
-                </Button>
-              </div>
+              </form>
+
+              {popular.length > 0 ? (
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Popular searches:</span>
+                  {popular.map((city) => (
+                    <button
+                      key={city}
+                      type="button"
+                      onClick={() => goSearch(city)}
+                      className="rounded-full bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-colors hover:bg-muted"
+                    >
+                      {city}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
-            <div className="animate-scale-in">
-              <img
-                src={heroImage}
-                alt="Illustration of a couple supported by fertility care, with a growing seedling"
-                width={1200}
-                height={1008}
-                className="mx-auto w-full max-w-lg rounded-3xl border border-border bg-card shadow-[var(--shadow-soft)]"
-              />
-            </div>
+
+            <HeroImage />
           </div>
         </section>
 
-        <SearchSection />
-
-        {/* Trust metrics */}
-        <section aria-labelledby="metrics-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <h2 id="metrics-heading" className="sr-only">
-            Seedova in numbers
+        {/* ---------------- TRUST STRIP ---------------- */}
+        <section aria-labelledby="trust-heading" className="mx-auto max-w-6xl px-4 pb-14 sm:px-6">
+          <h2 id="trust-heading" className="sr-only">
+            What Seedova gives you
           </h2>
-          <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-            {metricItems.map((m) => (
-              <div
-                key={m.label}
-                className="flex flex-col-reverse rounded-2xl border border-border bg-card p-6 text-center shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
-              >
-                <dt className="mt-1 text-xs text-muted-foreground sm:text-sm">{m.label}</dt>
-                <dd className="text-2xl font-semibold tracking-tight text-primary sm:text-3xl">
-                  {isPending ? (
-                    <Skeleton className="mx-auto h-8 w-16" />
-                  ) : (
-                    m.value.toLocaleString("en-IN")
-                  )}
-                </dd>
+          <div className="grid gap-px overflow-hidden rounded-[24px] border border-border/70 bg-border/60 shadow-[var(--shadow-soft)] sm:grid-cols-2 lg:grid-cols-4">
+            {trustStrip.map((t) => (
+              <div key={t.title} className="flex items-start gap-3 bg-card p-5">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-secondary text-primary">
+                  <t.icon className="h-4.5 w-4.5" aria-hidden />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-foreground">{t.title}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{t.body}</p>
+                </div>
               </div>
             ))}
-          </dl>
+          </div>
         </section>
 
-
-        {/* Why Seedova */}
-        <section id="about" aria-labelledby="why-heading" className="bg-secondary/40 py-16 sm:py-24">
+        {/* ---------------- JOURNEY ---------------- */}
+        <section aria-labelledby="journey-heading" className="border-y border-border/60 bg-secondary/40 py-14 sm:py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="max-w-2xl">
-              <h2 id="why-heading" className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Why Seedova
-              </h2>
-              <p className="mt-3 text-muted-foreground">
-                A calmer, clearer way to navigate fertility treatment in India.
-              </p>
-            </div>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {whySeedova.map((f) => (
-                <article
-                  key={f.title}
-                  className="rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
+            <h2
+              id="journey-heading"
+              className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-foreground sm:text-4xl"
+            >
+              From search to decision.
+            </h2>
+            <div className="mt-10 -mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-6 lg:gap-0">
+              {journeySteps.map((s, i) => (
+                <div
+                  key={s.title}
+                  className="group relative w-[70%] shrink-0 snap-start rounded-[20px] border border-border/70 bg-card p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-soft)] sm:w-auto lg:rounded-none lg:border-0 lg:border-l lg:bg-transparent lg:px-5 lg:py-1 lg:hover:translate-y-0"
                 >
-                  <div className="grid h-10 w-10 place-items-center rounded-xl bg-secondary text-primary">
-                    <f.icon className="h-5 w-5" aria-hidden="true" />
-                  </div>
-                  <h3 className="mt-4 text-base font-semibold text-foreground">{f.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{f.body}</p>
-                </article>
+                  <span className="font-mono-plex text-xs tracking-widest text-[color:var(--brand-purple)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <s.icon
+                    className="mt-3 h-5 w-5 text-primary transition-transform duration-300 group-hover:scale-110"
+                    aria-hidden
+                  />
+                  <h3 className="mt-3 text-base font-semibold text-foreground">{s.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* How it works */}
-        <section aria-labelledby="how-heading" className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
-          <h2 id="how-heading" className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            How it works
-          </h2>
-          <ol className="relative mt-10 space-y-8 border-l border-border pl-8">
-            {steps.map((s, i) => (
-              <li key={s.title} className="relative">
-                <span className="absolute -left-[3.05rem] grid h-10 w-10 place-items-center rounded-full border border-border bg-card text-primary shadow-[var(--shadow-soft)]">
-                  <s.icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Step {i + 1}
-                </p>
-                <h3 className="mt-1 text-lg font-semibold text-foreground">{s.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{s.body}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
+        {/* ---------------- CLINIC DISCOVERY ---------------- */}
+        <section aria-labelledby="clinics-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:justify-between">
+            <div className="min-w-0 max-w-xl">
+              <h2
+                id="clinics-heading"
+                className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-foreground sm:text-4xl"
+              >
+                Explore IVF clinics
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Discover clinics using transparent information that helps you compare your options.
+              </p>
+            </div>
+            <Button asChild variant="ghost" className="shrink-0 rounded-xl">
+              <Link to="/find-clinics">
+                View all <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
 
-        {/* Featured clinics */}
-        <section aria-labelledby="clinics-heading" className="bg-secondary/40 py-16 sm:py-24">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 id="clinics-heading" className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Featured IVF clinics
-            </h2>
-            <p className="mt-3 max-w-2xl text-muted-foreground">
-              Verified listings with cost ranges, success rates and patient ratings.
-            </p>
-            {isPending ? (
-              <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-[24rem] rounded-2xl" />
+          <div className="mt-8">
+            {clinics.isPending ? (
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {[0, 1, 2].map((i) => (
+                  <ClinicCardSkeleton key={i} />
                 ))}
               </div>
-            ) : featured.length === 0 ? (
-              <div className="mt-10">
-                <EmptyState
-                  icon={Building2}
-                  title="Clinic listings are on the way"
-                  description="We're verifying IVF clinics across India. Listings will appear here as soon as they're published."
-                  action={
-                    <Button asChild>
-                      <Link to="/find-clinics">Open clinic search</Link>
-                    </Button>
-                  }
-                />
-              </div>
+            ) : clinics.isError ? (
+              <EmptyState
+                icon={Sparkles}
+                title="Clinics couldn't be loaded"
+                description="Something went wrong while fetching clinic information. Please try again."
+                action={
+                  <Button variant="outline" onClick={() => clinics.refetch()}>
+                    Try again
+                  </Button>
+                }
+              />
+            ) : (clinics.data?.items.length ?? 0) === 0 ? (
+              <EmptyState
+                icon={BadgeCheck}
+                title="Clinic profiles are on the way"
+                description="Clinic profiles will appear here once verified data is available."
+              />
             ) : (
-              <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {featured.map((c) => (
-                  <article
-                    key={c.id}
-                    className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
-                  >
-                    <div
-                      className="grid h-36 place-items-center"
-                      style={{ background: "var(--gradient-primary)" }}
-                      aria-hidden="true"
-                    >
-                      <span className="text-3xl font-semibold text-primary-foreground/90">
-                        {c.name.charAt(0)}
-                      </span>
-                    </div>
-                    <div className="flex flex-1 flex-col p-6">
-                      <h3 className="text-base font-semibold text-foreground">{c.name}</h3>
-                      {c.location ? (
-                        <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
-                          <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" /> {c.location}
-                        </p>
-                      ) : null}
-                      <div className="mt-4 grid grid-cols-2 gap-3 text-xs">
-                        <div className="rounded-xl bg-secondary px-3 py-2">
-                          <p className="flex items-center gap-1 text-muted-foreground">
-                            <IndianRupee className="h-3 w-3" aria-hidden="true" /> Est. cost
-                          </p>
-                          <p className="mt-0.5 font-semibold text-foreground">{c.costLabel}</p>
-                        </div>
-                        <div className="rounded-xl bg-secondary px-3 py-2">
-                          <p className="flex items-center gap-1 text-muted-foreground">
-                            <TrendingUp className="h-3 w-3" aria-hidden="true" /> Success rate
-                          </p>
-                          <p className="mt-0.5 font-semibold text-foreground">{c.successLabel}</p>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex items-center gap-2">
-                        <Rating value={c.rating} />
-                        <span className="text-xs text-muted-foreground">
-                          {c.reviews > 0 ? `${c.rating.toFixed(1)} · ${c.reviews} reviews` : "No reviews yet"}
-                        </span>
-                      </div>
-                      {c.description ? (
-                        <p className="mt-3 text-sm text-muted-foreground">{c.description}</p>
-                      ) : null}
-                      <Button asChild variant="outline" className="mt-5 w-full">
-                        <Link to="/find-clinics" aria-label={`View details for ${c.name}`}>
-                          View Details
-                        </Link>
-                      </Button>
-                    </div>
-                  </article>
+              <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+                {clinics.data!.items.map((clinic) => (
+                  <ClinicCard
+                    key={clinic.id}
+                    clinic={clinic}
+                    view="grid"
+                    saved={false}
+                    compared={false}
+                    onToggleSave={() => navigate({ to: "/find-clinics", search: {} })}
+                    onToggleCompare={() => navigate({ to: "/find-clinics", search: {} })}
+                  />
                 ))}
               </div>
             )}
           </div>
         </section>
 
+        {/* ---------------- REVIEWS ---------------- */}
+        <section aria-labelledby="reviews-heading" className="border-y border-border/60 bg-secondary/40 py-16 sm:py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="max-w-xl">
+              <h2
+                id="reviews-heading"
+                className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-foreground sm:text-4xl"
+              >
+                Real experiences. No names attached.
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                Learn from anonymous patient experiences before making an important decision.
+              </p>
+            </div>
 
-        {/* Patient stories */}
-        <section aria-labelledby="stories-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-          <h2 id="stories-heading" className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Anonymous patient stories
-          </h2>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            Experiences shared without names, photos or identities.
-          </p>
-          {isPending ? (
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-48 rounded-2xl" />
-              ))}
+            <div className="mt-8">
+              {overview.isPending ? (
+                <div className="grid gap-5 md:grid-cols-3">
+                  {[0, 1, 2].map((i) => (
+                    <div key={i} className="h-40 animate-pulse rounded-[22px] border border-border/70 bg-card" />
+                  ))}
+                </div>
+              ) : (overview.data?.stories.length ?? 0) === 0 ? (
+                <EmptyState
+                  icon={Quote}
+                  title="No reviews published yet"
+                  description="Anonymous patient experiences will appear here once they are shared and verified."
+                />
+              ) : (
+                <div className="grid gap-5 md:grid-cols-3">
+                  {overview.data!.stories.map((s) => (
+                    <article
+                      key={s.id}
+                      className="rounded-[22px] border border-border/70 bg-card p-6 shadow-[var(--shadow-soft)]"
+                    >
+                      <div className="flex items-center gap-1 text-primary">
+                        {Array.from({ length: s.rating }).map((_, i) => (
+                          <Star key={i} className="h-3.5 w-3.5 fill-current" aria-hidden />
+                        ))}
+                        <span className="sr-only">{s.rating} out of 5</span>
+                      </div>
+                      <p className="mt-4 line-clamp-5 text-sm leading-relaxed text-foreground">{s.text}</p>
+                      <p className="mt-4 text-xs text-muted-foreground">
+                        {s.handle}
+                        {s.context ? ` · ${s.context}` : ""}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              )}
             </div>
-          ) : stories.length === 0 ? (
-            <div className="mt-10">
-              <EmptyState
-                icon={MessageCircle}
-                title="No patient stories yet"
-                description="Verified, anonymous reviews will appear here as patients share their treatment journeys."
-              />
+
+            <div className="mt-8">
+              <Button asChild variant="outline" className="rounded-xl">
+                <Link to="/reviews">
+                  Explore reviews <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
             </div>
-          ) : (
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
-              {stories.map((s) => (
-                <figure
-                  key={s.id}
-                  className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-transform duration-200 hover:-translate-y-1"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-foreground">{s.handle}</p>
-                      {s.context ? (
-                        <p className="truncate text-xs text-muted-foreground">{s.context}</p>
-                      ) : null}
-                    </div>
-                    <Badge variant="secondary" className="shrink-0 gap-1">
-                      <BadgeCheck className="h-3.5 w-3.5 text-accent" aria-hidden="true" /> Verified
-                    </Badge>
-                  </div>
-                  <div className="mt-3">
-                    <Rating value={s.rating} />
-                  </div>
-                  <blockquote className="mt-3 flex-1 text-sm text-muted-foreground">“{s.text}”</blockquote>
-                </figure>
-              ))}
-            </div>
-          )}
+          </div>
         </section>
 
-
-        {/* Community preview */}
-        <section aria-labelledby="community-heading" className="bg-secondary/40 py-16 sm:py-24">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6">
-            <h2 id="community-heading" className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              From the community
+        {/* ---------------- COMMUNITY ---------------- */}
+        <section aria-labelledby="community-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+          <div className="max-w-xl">
+            <h2
+              id="community-heading"
+              className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-foreground sm:text-4xl"
+            >
+              Questions are easier when you don't ask alone.
             </h2>
-            <p className="mt-3 text-muted-foreground">Latest anonymous questions from patients like you.</p>
-            {isPending ? (
-              <ul className="mt-8 space-y-3">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <li key={i}>
-                    <Skeleton className="h-[4.5rem] w-full rounded-2xl" />
-                  </li>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+              Ask anonymously and learn from people going through the same journey.
+            </p>
+          </div>
+
+          <div className="mt-8">
+            {overview.isPending ? (
+              <div className="space-y-3">
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="h-16 animate-pulse rounded-[18px] border border-border/70 bg-card" />
                 ))}
-              </ul>
-            ) : questions.length === 0 ? (
-              <div className="mt-8">
-                <EmptyState
-                  icon={MessageCircle}
-                  title="No questions yet"
-                  description="Be the first to ask something anonymously — the community is just getting started."
-                />
               </div>
+            ) : (overview.data?.questions.length ?? 0) === 0 ? (
+              <EmptyState
+                icon={MessageCircleQuestion}
+                title="No questions yet"
+                description="Community questions and answers will appear here as members start the conversation."
+              />
             ) : (
-              <ul className="mt-8 space-y-3">
-                {questions.map((q) => (
+              <ul className="divide-y divide-border/70 overflow-hidden rounded-[22px] border border-border/70 bg-card">
+                {overview.data!.questions.slice(0, 3).map((q) => (
                   <li key={q.id}>
                     <Link
                       to="/community"
-                      className="flex items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-soft)] transition-colors hover:bg-card/80"
+                      className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 p-5 transition-colors hover:bg-secondary/60"
                     >
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-medium text-foreground">{q.title}</span>
-                        <span className="mt-1 block text-xs text-muted-foreground">
-                          {q.tag} · {q.answers} answers
-                        </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-foreground">{q.title}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">{q.tag}</p>
+                      </div>
+                      <span className="font-mono-plex shrink-0 text-xs text-muted-foreground">
+                        {q.answers} {q.answers === 1 ? "reply" : "replies"}
                       </span>
-                      <MessageCircle className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                     </Link>
                   </li>
                 ))}
               </ul>
             )}
-            <div className="mt-8">
-              <Button asChild size="lg">
-                <Link to="/community">View Community</Link>
-              </Button>
-            </div>
+          </div>
+
+          <div className="mt-8">
+            <Button asChild variant="outline" className="rounded-xl">
+              <Link to="/community">
+                Explore community <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </section>
 
-
-        {/* CTA */}
-        <section aria-labelledby="cta-heading" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-          <div
-            className="rounded-3xl px-6 py-14 text-center shadow-[var(--shadow-soft)]"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            <h2
-              id="cta-heading"
-              className="text-balance text-3xl font-semibold tracking-tight text-primary-foreground sm:text-4xl"
-            >
-              Start Your Fertility Journey with Confidence
+        {/* ---------------- FINAL CTA ---------------- */}
+        <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
+          <div className="overflow-hidden rounded-[28px] border border-border/70 bg-card px-6 py-14 text-center shadow-[var(--shadow-soft)] sm:px-10">
+            <h2 className="font-[family-name:var(--font-display)] text-3xl tracking-tight text-foreground sm:text-4xl">
+              Choose your IVF clinic with confidence.
             </h2>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <Button asChild size="lg" variant="secondary">
-                <a href="#find-clinics">Find Clinics</a>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="bg-transparent text-primary-foreground">
-                <Link to="/community">Join Community</Link>
-              </Button>
-            </div>
+            <p className="font-mono-plex mt-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Search. Verify. Compare. Learn. Decide.
+            </p>
+            <Button asChild size="lg" className="mt-8 rounded-2xl px-8 transition-transform hover:-translate-y-0.5">
+              <Link to="/find-clinics">
+                Find IVF clinics <ArrowRight className="ml-1 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </section>
       </main>
+
       <Footer />
     </div>
   );
 }
+
+/** Hero visual — swap the asset pointer to replace the image without touching layout. */
+function HeroImage() {
+  return (
+    <div className="animate-fade-in relative">
+      <div
+        aria-hidden
+        className="absolute -inset-3 rounded-[36px] bg-[image:var(--gradient-primary)] opacity-[0.06]"
+      />
+      <img
+        src={heroCouple.url}
+        alt="A couple looking at a laptop together while researching fertility clinics at home"
+        width={768}
+        height={793}
+        className="relative aspect-[4/3.6] w-full rounded-[28px] object-cover shadow-[0_30px_80px_-40px_oklch(0.3_0.02_161_/_0.55)] transition-transform duration-700 hover:scale-[1.01] lg:aspect-auto"
+      />
+    </div>
+  );
+}
+
+export { Users, GitCompare, MessagesSquare, Lock };
