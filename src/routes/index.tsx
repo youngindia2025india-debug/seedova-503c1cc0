@@ -5,16 +5,12 @@ import { useServerFn } from "@tanstack/react-start";
 import {
   ArrowRight,
   BadgeCheck,
-  GitCompare,
-  Lock,
   MessageCircleQuestion,
-  MessagesSquare,
   Quote,
   Search,
   ShieldCheck,
   Sparkles,
   Star,
-  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -424,5 +420,3 @@ function HeroImage() {
     </div>
   );
 }
-
-export { Users, GitCompare, MessagesSquare, Lock };

@@ -1,42 +1,46 @@
 import {
-  ShieldCheck,
-  Users,
-  GitCompare,
-  HeartHandshake,
-  Search,
-  Scale,
-  MessagesSquare,
+  BadgeCheck,
   CheckCircle2,
+  Eye,
+  GitCompare,
+  Lock,
+  MessagesSquare,
+  Search,
+  ShieldCheck,
+  Star,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
-export const whySeedova: { icon: LucideIcon; title: string; body: string }[] = [
-
+/** Platform capabilities — not claims about individual clinics. */
+export const trustStrip: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: ShieldCheck,
-    title: "Transparent Clinic Information",
-    body: "Verified details on services, success rates and realistic cost ranges — no hidden surprises.",
+    title: "ART registration checks",
+    body: "We record registration details clinics provide, where available.",
   },
   {
     icon: Users,
-    title: "Anonymous Community",
-    body: "Ask sensitive questions and share your story without ever revealing who you are.",
+    title: "Anonymous reviews",
+    body: "Real experiences shared without names attached.",
   },
   {
-    icon: GitCompare,
-    title: "Compare Clinics Easily",
-    body: "Put shortlisted clinics side by side on cost, outcomes and patient feedback.",
+    icon: Eye,
+    title: "Transparent information",
+    body: "Only information that is published and sourced.",
   },
   {
-    icon: HeartHandshake,
-    title: "Patient-first Experience",
-    body: "Built around your journey, not advertising. Clinics can't pay for better placement.",
+    icon: Lock,
+    title: "Privacy first",
+    body: "Your identity stays yours. Always.",
   },
 ];
 
-export const steps: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: Search, title: "Search Clinics", body: "Find IVF clinics by city, state or treatment type." },
-  { icon: Scale, title: "Compare Clinics", body: "Weigh cost ranges, success rates and services side by side." },
-  { icon: MessagesSquare, title: "Read Anonymous Experiences", body: "Learn from patients who walked the same path." },
-  { icon: CheckCircle2, title: "Make an Informed Decision", body: "Choose a clinic with clarity and confidence." },
+export const journeySteps: { icon: LucideIcon; title: string; body: string }[] = [
+  { icon: Search, title: "Search", body: "Find clinics that match your needs." },
+  { icon: BadgeCheck, title: "Verified clinics", body: "Identify verified clinic information." },
+  { icon: GitCompare, title: "Compare", body: "Compare the information that matters." },
+  { icon: Star, title: "Reviews", body: "Learn from anonymous experiences." },
+  { icon: MessagesSquare, title: "Community", body: "Ask questions and learn from others." },
+  { icon: CheckCircle2, title: "Decide", body: "Choose with greater confidence." },
 ];

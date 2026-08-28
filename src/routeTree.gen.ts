@@ -10,7 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FindClinicsRouteImport } from './routes/find-clinics'
 import { Route as CommunityRouteImport } from './routes/community'
@@ -37,9 +40,24 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReviewsRoute = ReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesRoute = ResourcesRouteImport.update({
+  id: '/resources',
+  path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -156,7 +174,10 @@ export interface FileRoutesByFullPath {
   '/community': typeof CommunityRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/legal': typeof LegalRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/resources': typeof ResourcesRoute
+  '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -178,7 +199,10 @@ export interface FileRoutesByTo {
   '/community': typeof CommunityRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/legal': typeof LegalRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/resources': typeof ResourcesRoute
+  '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -203,7 +227,10 @@ export interface FileRoutesById {
   '/community': typeof CommunityRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/legal': typeof LegalRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/resources': typeof ResourcesRoute
+  '/reviews': typeof ReviewsRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
@@ -228,7 +255,10 @@ export interface FileRouteTypes {
     | '/community'
     | '/find-clinics'
     | '/forgot-password'
+    | '/legal'
     | '/reset-password'
+    | '/resources'
+    | '/reviews'
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
@@ -250,7 +280,10 @@ export interface FileRouteTypes {
     | '/community'
     | '/find-clinics'
     | '/forgot-password'
+    | '/legal'
     | '/reset-password'
+    | '/resources'
+    | '/reviews'
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
@@ -274,7 +307,10 @@ export interface FileRouteTypes {
     | '/community'
     | '/find-clinics'
     | '/forgot-password'
+    | '/legal'
     | '/reset-password'
+    | '/resources'
+    | '/reviews'
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
@@ -299,7 +335,10 @@ export interface RootRouteChildren {
   CommunityRoute: typeof CommunityRoute
   FindClinicsRoute: typeof FindClinicsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LegalRoute: typeof LegalRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ResourcesRoute: typeof ResourcesRoute
+  ReviewsRoute: typeof ReviewsRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
@@ -312,11 +351,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reviews': {
+      id: '/reviews'
+      path: '/reviews'
+      fullPath: '/reviews'
+      preLoaderRoute: typeof ReviewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources': {
+      id: '/resources'
+      path: '/resources'
+      fullPath: '/resources'
+      preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -517,7 +577,10 @@ const rootRouteChildren: RootRouteChildren = {
   CommunityRoute: CommunityRoute,
   FindClinicsRoute: FindClinicsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  LegalRoute: LegalRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ResourcesRoute: ResourcesRoute,
+  ReviewsRoute: ReviewsRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
 }
 export const routeTree = rootRouteImport
