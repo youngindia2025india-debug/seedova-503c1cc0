@@ -87,6 +87,9 @@ export const Route = createFileRoute("/find-clinics")({
       },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: typeof search.q === "string" && search.q ? search.q : undefined,
+  }),
   component: FindClinicsPage,
 });
 
@@ -109,8 +112,9 @@ function FindClinicsPage() {
   const savedIdsFn = useServerFn(listSavedClinicIds);
   const toggleSaveFn = useServerFn(toggleSavedClinic);
 
-  const [query, setQuery] = useState("");
-  const [submitted, setSubmitted] = useState("");
+  const { q: initialQuery } = Route.useSearch();
+  const [query, setQuery] = useState(initialQuery ?? "");
+  const [submitted, setSubmitted] = useState(initialQuery ?? "");
   const [filters, setFilters] = useState<ClinicFilterState>(DEFAULT_FILTERS);
   const [sort, setSort] = useState<SortKey>("rating");
   const [view, setView] = useState<"grid" | "list">("grid");
