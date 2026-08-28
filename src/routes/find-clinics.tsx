@@ -87,9 +87,8 @@ export const Route = createFileRoute("/find-clinics")({
       },
     ],
   }),
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: typeof search.q === "string" && search.q ? search.q : undefined,
-  }),
+  validateSearch: (search: Record<string, unknown>): { q?: string } =>
+    typeof search.q === "string" && search.q ? { q: search.q } : {},
   component: FindClinicsPage,
 });
 
