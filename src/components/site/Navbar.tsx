@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@/lib/auth-context";
 
 const nav = [
+  { to: "/clinics", label: "Clinics" },
   { to: "/find-clinics", label: "Find Clinics" },
   { to: "/find-clinics", label: "Compare" },
   { to: "/reviews", label: "Reviews" },

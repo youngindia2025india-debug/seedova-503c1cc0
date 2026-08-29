@@ -17,11 +17,13 @@ import { Route as LegalRouteImport } from './routes/legal'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FindClinicsRouteImport } from './routes/find-clinics'
 import { Route as CommunityRouteImport } from './routes/community'
+import { Route as ClinicsRouteImport } from './routes/clinics'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as ClinicsClinicIdRouteImport } from './routes/clinics.$clinicId'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminReviewsRouteImport } from './routes/admin/reviews'
 import { Route as AdminImportRouteImport } from './routes/admin/import'
@@ -75,6 +77,11 @@ const CommunityRoute = CommunityRouteImport.update({
   path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClinicsRoute = ClinicsRouteImport.update({
+  id: '/clinics',
+  path: '/clinics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -98,6 +105,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const ClinicsClinicIdRoute = ClinicsClinicIdRouteImport.update({
+  id: '/$clinicId',
+  path: '/$clinicId',
+  getParentRoute: () => ClinicsRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
@@ -171,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/clinics': typeof ClinicsRouteWithChildren
   '/community': typeof CommunityRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -184,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/clinics/$clinicId': typeof ClinicsClinicIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/community': typeof AuthenticatedDashboardCommunityRoute
   '/dashboard/my-reviews': typeof AuthenticatedDashboardMyReviewsRoute
@@ -196,6 +210,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/clinics': typeof ClinicsRouteWithChildren
   '/community': typeof CommunityRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -209,6 +224,7 @@ export interface FileRoutesByTo {
   '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/clinics/$clinicId': typeof ClinicsClinicIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard/community': typeof AuthenticatedDashboardCommunityRoute
   '/dashboard/my-reviews': typeof AuthenticatedDashboardMyReviewsRoute
@@ -224,6 +240,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/clinics': typeof ClinicsRouteWithChildren
   '/community': typeof CommunityRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -237,6 +254,7 @@ export interface FileRoutesById {
   '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/clinics/$clinicId': typeof ClinicsClinicIdRoute
   '/admin/': typeof AdminIndexRoute
   '/_authenticated/dashboard/community': typeof AuthenticatedDashboardCommunityRoute
   '/_authenticated/dashboard/my-reviews': typeof AuthenticatedDashboardMyReviewsRoute
@@ -252,6 +270,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/clinics'
     | '/community'
     | '/find-clinics'
     | '/forgot-password'
@@ -265,6 +284,7 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
+    | '/clinics/$clinicId'
     | '/admin/'
     | '/dashboard/community'
     | '/dashboard/my-reviews'
@@ -277,6 +297,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/clinics'
     | '/community'
     | '/find-clinics'
     | '/forgot-password'
@@ -290,6 +311,7 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
+    | '/clinics/$clinicId'
     | '/admin'
     | '/dashboard/community'
     | '/dashboard/my-reviews'
@@ -304,6 +326,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/admin'
     | '/auth'
+    | '/clinics'
     | '/community'
     | '/find-clinics'
     | '/forgot-password'
@@ -317,6 +340,7 @@ export interface FileRouteTypes {
     | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
+    | '/clinics/$clinicId'
     | '/admin/'
     | '/_authenticated/dashboard/community'
     | '/_authenticated/dashboard/my-reviews'
@@ -332,6 +356,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ClinicsRoute: typeof ClinicsRouteWithChildren
   CommunityRoute: typeof CommunityRoute
   FindClinicsRoute: typeof FindClinicsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
@@ -400,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/clinics': {
+      id: '/clinics'
+      path: '/clinics'
+      fullPath: '/clinics'
+      preLoaderRoute: typeof ClinicsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -434,6 +466,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/clinics/$clinicId': {
+      id: '/clinics/$clinicId'
+      path: '/$clinicId'
+      fullPath: '/clinics/$clinicId'
+      preLoaderRoute: typeof ClinicsClinicIdRouteImport
+      parentRoute: typeof ClinicsRoute
     }
     '/admin/users': {
       id: '/admin/users'
@@ -569,11 +608,23 @@ const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
   AdminRouteRouteChildren,
 )
 
+interface ClinicsRouteChildren {
+  ClinicsClinicIdRoute: typeof ClinicsClinicIdRoute
+}
+
+const ClinicsRouteChildren: ClinicsRouteChildren = {
+  ClinicsClinicIdRoute: ClinicsClinicIdRoute,
+}
+
+const ClinicsRouteWithChildren =
+  ClinicsRoute._addFileChildren(ClinicsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ClinicsRoute: ClinicsRouteWithChildren,
   CommunityRoute: CommunityRoute,
   FindClinicsRoute: FindClinicsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
