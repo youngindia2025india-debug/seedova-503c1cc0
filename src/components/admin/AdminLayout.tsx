@@ -24,6 +24,7 @@ import {
 const items = [
   { to: "/admin", label: "Analytics", icon: BarChart3, exact: true },
   { to: "/admin/clinics", label: "Manage Clinics", icon: Building2 },
+  { to: "/admin/directory", label: "Clinic Directory", icon: ListChecks },
   { to: "/admin/import", label: "Import Data", icon: Upload },
   { to: "/admin/reviews", label: "Moderate Reviews", icon: Star },
   { to: "/admin/community", label: "Moderate Community", icon: MessagesSquare },
