@@ -79,6 +79,39 @@ export type Database = {
         }
         Relationships: []
       }
+      clinic_directory: {
+        Row: {
+          art_registered: boolean
+          art_registry_link: string | null
+          created_at: string
+          id: string
+          is_verified: boolean
+          name: string
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          art_registered?: boolean
+          art_registry_link?: string | null
+          created_at?: string
+          id?: string
+          is_verified?: boolean
+          name: string
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          art_registered?: boolean
+          art_registry_link?: string | null
+          created_at?: string
+          id?: string
+          is_verified?: boolean
+          name?: string
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       clinic_images: {
         Row: {
           caption: string | null
