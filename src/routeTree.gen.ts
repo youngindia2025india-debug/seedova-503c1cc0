@@ -27,6 +27,7 @@ import { Route as ClinicsClinicIdRouteImport } from './routes/clinics.$clinicId'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminReviewsRouteImport } from './routes/admin/reviews'
 import { Route as AdminImportRouteImport } from './routes/admin/import'
+import { Route as AdminDirectoryRouteImport } from './routes/admin/directory'
 import { Route as AdminCommunityRouteImport } from './routes/admin/community'
 import { Route as AdminClinicsRouteImport } from './routes/admin/clinics'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
@@ -126,6 +127,11 @@ const AdminImportRoute = AdminImportRouteImport.update({
   path: '/import',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminDirectoryRoute = AdminDirectoryRouteImport.update({
+  id: '/directory',
+  path: '/directory',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminCommunityRoute = AdminCommunityRouteImport.update({
   id: '/community',
   path: '/community',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/directory': typeof AdminDirectoryRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/directory': typeof AdminDirectoryRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/clinics': typeof AdminClinicsRoute
   '/admin/community': typeof AdminCommunityRoute
+  '/admin/directory': typeof AdminDirectoryRoute
   '/admin/import': typeof AdminImportRoute
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
+    | '/admin/directory'
     | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
+    | '/admin/directory'
     | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/clinics'
     | '/admin/community'
+    | '/admin/directory'
     | '/admin/import'
     | '/admin/reviews'
     | '/admin/users'
@@ -495,6 +507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminImportRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/directory': {
+      id: '/admin/directory'
+      path: '/directory'
+      fullPath: '/admin/directory'
+      preLoaderRoute: typeof AdminDirectoryRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/community': {
       id: '/admin/community'
       path: '/community'
@@ -589,6 +608,7 @@ const AuthenticatedRouteRouteWithChildren =
 interface AdminRouteRouteChildren {
   AdminClinicsRoute: typeof AdminClinicsRoute
   AdminCommunityRoute: typeof AdminCommunityRoute
+  AdminDirectoryRoute: typeof AdminDirectoryRoute
   AdminImportRoute: typeof AdminImportRoute
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -598,6 +618,7 @@ interface AdminRouteRouteChildren {
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminClinicsRoute: AdminClinicsRoute,
   AdminCommunityRoute: AdminCommunityRoute,
+  AdminDirectoryRoute: AdminDirectoryRoute,
   AdminImportRoute: AdminImportRoute,
   AdminReviewsRoute: AdminReviewsRoute,
   AdminUsersRoute: AdminUsersRoute,
