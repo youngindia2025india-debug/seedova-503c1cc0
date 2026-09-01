@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type DirectoryClinic = {
   id: string;
@@ -105,4 +106,92 @@ export const getDirectoryClinic = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     return row ? toDirectoryClinic(row as DirectoryRow) : null;
+  });
+
+/* ------------------------------------------------------------------ */
+/* Admin management                                                    */
+/* ------------------------------------------------------------------ */
+
+export type DirectoryInput = {
+  id?: string;
+  name: string;
+  state: string;
+  isVerified: boolean;
+  artRegistered: boolean;
+  artRegistryLink: string | null;
+};
+
+async function assertAdmin(context: { supabase: any; userId: string }) {
+  const { data, error } = await context.supabase.rpc("has_role", {
+    _user_id: context.userId,
+    _role: "admin",
+  });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Forbidden: admin role required");
+}
+
+export const adminListDirectoryClinics = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<DirectoryClinic[]> => {
+    await assertAdmin(context as any);
+    const { data, error } = await (context as any).supabase
+      .from("clinic_directory")
+      .select("id, name, state, is_verified, art_registered, art_registry_link")
+      .order("name", { ascending: true });
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row: DirectoryRow) => toDirectoryClinic(row));
+  });
+
+export const adminSaveDirectoryClinic = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: DirectoryInput) => ({
+    id: input.id ? String(input.id) : undefined,
+    name: String(input.name ?? "").trim(),
+    state: String(input.state ?? "").trim(),
+    isVerified: Boolean(input.isVerified),
+    artRegistered: Boolean(input.artRegistered),
+    artRegistryLink: input.artRegistryLink ? String(input.artRegistryLink).trim() : null,
+  }))
+  .handler(async ({ data, context }): Promise<{ id: string }> => {
+    await assertAdmin(context as any);
+    if (!data.name) throw new Error("Clinic name is required");
+    if (!data.state) throw new Error("State is required");
+
+    const payload = {
+      name: data.name,
+      state: data.state,
+      is_verified: data.isVerified,
+      art_registered: data.artRegistered,
+      art_registry_link: data.artRegistryLink,
+    };
+
+    const supabase = (context as any).supabase;
+    if (data.id) {
+      const { error } = await supabase
+        .from("clinic_directory")
+        .update(payload)
+        .eq("id", data.id);
+      if (error) throw new Error(error.message);
+      return { id: data.id };
+    }
+    const { data: inserted, error } = await supabase
+      .from("clinic_directory")
+      .insert(payload)
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: inserted.id as string };
+  });
+
+export const adminDeleteDirectoryClinic = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => ({ id: String(input.id) }))
+  .handler(async ({ data, context }): Promise<{ ok: true }> => {
+    await assertAdmin(context as any);
+    const { error } = await (context as any).supabase
+      .from("clinic_directory")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
