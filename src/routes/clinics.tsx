@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
+import { Navbar } from "@/components/site/Navbar";
+import { Footer } from "@/components/site/Footer";
 import { searchDirectoryClinics } from "@/lib/directory.functions";
 
 const clinicsSearchSchema = z.object({
@@ -49,7 +51,7 @@ function ClinicsDirectoryPage() {
   const navigate = Route.useNavigate();
   const [input, setInput] = useState(q);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["clinic-directory", q, state],
     queryFn: () => searchDirectoryClinics({ data: { query: q, state } }),
   });
@@ -59,7 +61,9 @@ function ClinicsDirectoryPage() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-16">
+    <div className="flex min-h-screen flex-col">
+    <Navbar />
+    <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-10 sm:px-6 sm:py-16">
       <header className="max-w-xl">
         <h1 className="font-[family-name:var(--font-display)] text-4xl font-semibold italic text-foreground sm:text-5xl">
           Clinics
@@ -135,6 +139,8 @@ function ClinicsDirectoryPage() {
               <Skeleton key={i} className="h-20 w-full rounded-2xl" />
             ))}
           </div>
+        ) : error ? (
+          <EmptyState icon={Search} title="Could not load clinics" description={(error as Error).message} />
         ) : !data || data.items.length === 0 ? (
           <EmptyState
             icon={Search}
@@ -183,5 +189,7 @@ function ClinicsDirectoryPage() {
         )}
       </section>
     </main>
+    <Footer />
+    </div>
   );
 }

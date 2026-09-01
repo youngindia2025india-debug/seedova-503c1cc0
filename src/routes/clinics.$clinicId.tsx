@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowUpRight, BadgeCheck, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Navbar } from "@/components/site/Navbar";
+import { Footer } from "@/components/site/Footer";
 import { getDirectoryClinic } from "@/lib/directory.functions";
 
 export const Route = createFileRoute("/clinics/$clinicId")({
@@ -37,7 +39,9 @@ function ClinicDetailPage() {
   const clinic = Route.useLoaderData();
 
   return (
-    <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-16">
+    <div className="flex min-h-screen flex-col">
+    <Navbar />
+    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6 sm:py-16">
       <Button asChild variant="ghost" size="sm" className="-ml-2 rounded-xl">
         <Link to="/clinics" search={{ q: "", state: "all" }}>
           <ArrowLeft className="h-4 w-4" />
@@ -84,6 +88,8 @@ function ClinicDetailPage() {
         </div>
       </article>
     </main>
+    <Footer />
+    </div>
   );
 }
 
