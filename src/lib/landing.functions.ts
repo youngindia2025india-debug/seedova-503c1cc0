@@ -44,6 +44,7 @@ export type LandingQuestion = {
   title: string;
   tag: string;
   answers: number;
+  createdAt: string;
 };
 
 export type LandingOverview = {
@@ -89,7 +90,7 @@ export const getLandingOverview = createServerFn({ method: "GET" }).handler(
           .limit(3),
         supabase
           .from("questions")
-          .select("id, title, tags, answer_count")
+          .select("id, title, tags, answer_count, created_at")
           .order("created_at", { ascending: false })
           .limit(4),
       ]);
@@ -131,6 +132,7 @@ export const getLandingOverview = createServerFn({ method: "GET" }).handler(
         title: q.title,
         tag: q.tags?.[0] ?? "Community",
         answers: q.answer_count ?? 0,
+        createdAt: q.created_at,
       })),
     };
   },
