@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -23,9 +24,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useAuth } from "@/lib/auth-context";
-import { getLandingOverview } from "@/lib/landing.functions";
-import { getMySavedClinics, getMyTreatmentJourney } from "@/lib/dashboard.functions";
-import heroCouple from "@/assets/hero-couple.jpg.asset.json";
+import { getDashboardCommunityQuestions, getMyProfile, getMySavedClinics, getMyTreatmentJourney } from "@/lib/dashboard.functions";
+import dashboardCouple from "@/assets/dashboard-couple.png";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   head: () => ({ meta: [{ title: "Your Seedova dashboard" }, { name: "robots", content: "noindex" }] }),
@@ -74,13 +74,18 @@ const resources = [
   { title: "How to compare fertility clinics", to: "/find-clinics" },
 ] as const;
 
+function firstNameFromValue(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const firstName = value.trim().split(/\s+/)[0];
+  return firstName || null;
+}
+
 function firstNameFromUser(user: ReturnType<typeof useAuth>["user"]): string | null {
   const metadata = user?.user_metadata;
-  const fullName = typeof metadata?.full_name === "string" ? metadata.full_name :
-    typeof metadata?.name === "string" ? metadata.name :
-    typeof metadata?.display_name === "string" ? metadata.display_name :
-    typeof metadata?.first_name === "string" ? metadata.first_name : "";
-  const firstName = fullName.trim().split(/\s+/)[0];
+  const firstName = firstNameFromValue(metadata?.full_name) ??
+    firstNameFromValue(metadata?.name) ??
+    firstNameFromValue(metadata?.display_name) ??
+    firstNameFromValue(metadata?.first_name);
   return firstName || null;
 }
 
@@ -96,10 +101,12 @@ function relativeTime(date: string) {
 
 function DashboardHome() {
   const { user } = useAuth();
-  const overviewFn = useServerFn(getLandingOverview);
+  const communityFn = useServerFn(getDashboardCommunityQuestions);
+  const profileFn = useServerFn(getMyProfile);
   const savedClinicsFn = useServerFn(getMySavedClinics);
   const journeyFn = useServerFn(getMyTreatmentJourney);
-  const overview = useQuery({ queryKey: ["dashboard-community"], queryFn: () => overviewFn() });
+  const community = useQuery({ queryKey: ["dashboard-community"], queryFn: () => communityFn() });
+  const profile = useQuery({ queryKey: ["dashboard-profile"], queryFn: () => profileFn() });
   const savedClinics = useQuery({ queryKey: ["dashboard-saved-clinics"], queryFn: () => savedClinicsFn() });
   const journey = useQuery({ queryKey: ["dashboard-treatment-journey"], queryFn: () => journeyFn() });
 
@@ -108,7 +115,7 @@ function DashboardHome() {
     return stages.reduce((count, stage) => count + (stageNames.has(stage.toLowerCase()) ? 1 : 0), 0);
   }, [journey.data]);
   const currentStage = stages[Math.min(completedStages, stages.length - 1)];
-  const name = firstNameFromUser(user);
+  const name = firstNameFromUser(user) ?? firstNameFromValue(profile.data?.displayName);
 
   return (
     <div className="mx-auto max-w-6xl space-y-10 pb-8 lg:space-y-12">
@@ -238,7 +245,7 @@ function DashboardHome() {
       <section aria-labelledby="community-heading" className="rounded-[20px] border border-border/70 bg-secondary/45 p-6 sm:p-8">
         <SectionHeading title="From the Seedova Community" action={<Button asChild variant="ghost" size="sm" className="rounded-xl"><Link to="/community">View community <ArrowRight className="h-4 w-4" /></Link></Button>} />
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          {overview.isPending ? [0, 1, 2].map((item) => <Skeleton key={item} className="h-40 rounded-[16px]" />) : overview.data?.questions.slice(0, 3).map((question) => (
+          {community.isPending ? [0, 1, 2].map((item) => <Skeleton key={item} className="h-40 rounded-[16px]" />) : community.data?.map((question) => (
             <Link key={question.id} to="/community" className="group rounded-[16px] border border-border/70 bg-card p-5 transition-colors hover:border-primary/40">
               <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5"><CircleHelp className="h-3.5 w-3.5 text-primary" aria-hidden="true" />Anonymous</span>
@@ -251,7 +258,7 @@ function DashboardHome() {
               </div>
             </Link>
           ))}
-          {!overview.isPending && (overview.data?.questions.length ?? 0) === 0 ? <div className="lg:col-span-3"><EmptyState icon={MessageCircle} title="The community is just getting started" description="Questions from Seedova members will appear here as the conversation grows." action={<Button asChild variant="outline"><Link to="/community">Visit community</Link></Button>} /></div> : null}
+          {!community.isPending && (community.data?.length ?? 0) === 0 ? <div className="lg:col-span-3"><EmptyState icon={MessageCircle} title="The community is just getting started" description="Questions from Seedova members will appear here as the conversation grows." action={<Button asChild variant="outline"><Link to="/community">Visit community</Link></Button>} /></div> : null}
         </div>
       </section>
 
@@ -265,7 +272,7 @@ function DashboardHome() {
   );
 }
 
-function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: React.ReactNode }) {
+function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: ReactNode }) {
   return <div className="flex items-end justify-between gap-4"><div>{eyebrow ? <p className="font-mono-plex text-[10px] uppercase tracking-[0.16em] text-primary">{eyebrow}</p> : null}<h2 className="mt-1 font-sans text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h2></div>{action}</div>;
 }
 
@@ -274,5 +281,5 @@ function SavedClinicCard({ clinic }: { clinic: { id: string; name: string; city:
 }
 
 function DashboardIllustration() {
-  return <div className="relative min-h-[250px] overflow-hidden bg-secondary/70 lg:min-h-[390px]"><img src={heroCouple.url} alt="A couple researching fertility care together at home" width={768} height={793} className="h-full min-h-[250px] w-full object-cover object-center lg:min-h-[390px]" /></div>;
+  return <div className="relative min-h-[250px] overflow-hidden bg-secondary/70 lg:min-h-[390px]"><img src={dashboardCouple} alt="A couple researching fertility care together at home" width={886} height={850} className="h-full min-h-[250px] w-full object-cover object-center lg:min-h-[390px]" /></div>;
 }
