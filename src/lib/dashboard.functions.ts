@@ -18,6 +18,19 @@ export type DashboardJourneyEntry = {
   createdAt: string;
 };
 
+export const getMyProfile = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ displayName: string | null }> => {
+    const { data, error } = await context.supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", context.userId)
+      .maybeSingle();
+
+    if (error) throw new Error(error.message);
+    return { displayName: data?.display_name ?? null };
+  });
+
 export const getMySavedClinics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<DashboardSavedClinic[]> => {

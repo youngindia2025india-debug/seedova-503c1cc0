@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useAuth } from "@/lib/auth-context";
 import { getLandingOverview } from "@/lib/landing.functions";
-import { getMySavedClinics, getMyTreatmentJourney } from "@/lib/dashboard.functions";
+import { getMyProfile, getMySavedClinics, getMyTreatmentJourney } from "@/lib/dashboard.functions";
 import dashboardCouple from "@/assets/dashboard-couple.png";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
@@ -97,9 +97,11 @@ function relativeTime(date: string) {
 function DashboardHome() {
   const { user } = useAuth();
   const overviewFn = useServerFn(getLandingOverview);
+  const profileFn = useServerFn(getMyProfile);
   const savedClinicsFn = useServerFn(getMySavedClinics);
   const journeyFn = useServerFn(getMyTreatmentJourney);
   const overview = useQuery({ queryKey: ["dashboard-community"], queryFn: () => overviewFn() });
+  const profile = useQuery({ queryKey: ["dashboard-profile"], queryFn: () => profileFn() });
   const savedClinics = useQuery({ queryKey: ["dashboard-saved-clinics"], queryFn: () => savedClinicsFn() });
   const journey = useQuery({ queryKey: ["dashboard-treatment-journey"], queryFn: () => journeyFn() });
 
@@ -108,7 +110,7 @@ function DashboardHome() {
     return stages.reduce((count, stage) => count + (stageNames.has(stage.toLowerCase()) ? 1 : 0), 0);
   }, [journey.data]);
   const currentStage = stages[Math.min(completedStages, stages.length - 1)];
-  const name = firstNameFromUser(user);
+  const name = firstNameFromUser(user) ?? firstNameFromUser({ user_metadata: { full_name: profile.data?.displayName } } as typeof user);
 
   return (
     <div className="mx-auto max-w-6xl space-y-10 pb-8 lg:space-y-12">
