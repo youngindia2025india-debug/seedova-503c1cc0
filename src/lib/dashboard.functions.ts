@@ -18,6 +18,13 @@ export type DashboardJourneyEntry = {
   createdAt: string;
 };
 
+export type DashboardCommunityQuestion = {
+  id: string;
+  title: string;
+  answers: number;
+  createdAt: string;
+};
+
 export const getMyProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<{ displayName: string | null }> => {
@@ -29,6 +36,24 @@ export const getMyProfile = createServerFn({ method: "GET" })
 
     if (error) throw new Error(error.message);
     return { displayName: data?.display_name ?? null };
+  });
+
+export const getDashboardCommunityQuestions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<DashboardCommunityQuestion[]> => {
+    const { data, error } = await context.supabase
+      .from("questions")
+      .select("id, title, answer_count, created_at")
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((question) => ({
+      id: question.id,
+      title: question.title,
+      answers: question.answer_count,
+      createdAt: question.created_at,
+    }));
   });
 
 export const getMySavedClinics = createServerFn({ method: "GET" })

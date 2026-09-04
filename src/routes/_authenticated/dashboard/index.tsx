@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useAuth } from "@/lib/auth-context";
 import { getLandingOverview } from "@/lib/landing.functions";
-import { getMyProfile, getMySavedClinics, getMyTreatmentJourney } from "@/lib/dashboard.functions";
+import { getDashboardCommunityQuestions, getMyProfile, getMySavedClinics, getMyTreatmentJourney } from "@/lib/dashboard.functions";
 import dashboardCouple from "@/assets/dashboard-couple.png";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
@@ -101,11 +101,11 @@ function relativeTime(date: string) {
 
 function DashboardHome() {
   const { user } = useAuth();
-  const overviewFn = useServerFn(getLandingOverview);
+  const communityFn = useServerFn(getDashboardCommunityQuestions);
   const profileFn = useServerFn(getMyProfile);
   const savedClinicsFn = useServerFn(getMySavedClinics);
   const journeyFn = useServerFn(getMyTreatmentJourney);
-  const overview = useQuery({ queryKey: ["dashboard-community"], queryFn: () => overviewFn() });
+  const community = useQuery({ queryKey: ["dashboard-community"], queryFn: () => communityFn() });
   const profile = useQuery({ queryKey: ["dashboard-profile"], queryFn: () => profileFn() });
   const savedClinics = useQuery({ queryKey: ["dashboard-saved-clinics"], queryFn: () => savedClinicsFn() });
   const journey = useQuery({ queryKey: ["dashboard-treatment-journey"], queryFn: () => journeyFn() });
@@ -245,7 +245,7 @@ function DashboardHome() {
       <section aria-labelledby="community-heading" className="rounded-[20px] border border-border/70 bg-secondary/45 p-6 sm:p-8">
         <SectionHeading title="From the Seedova Community" action={<Button asChild variant="ghost" size="sm" className="rounded-xl"><Link to="/community">View community <ArrowRight className="h-4 w-4" /></Link></Button>} />
         <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          {overview.isPending ? [0, 1, 2].map((item) => <Skeleton key={item} className="h-40 rounded-[16px]" />) : overview.data?.questions.slice(0, 3).map((question) => (
+          {community.isPending ? [0, 1, 2].map((item) => <Skeleton key={item} className="h-40 rounded-[16px]" />) : community.data?.map((question) => (
             <Link key={question.id} to="/community" className="group rounded-[16px] border border-border/70 bg-card p-5 transition-colors hover:border-primary/40">
               <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5"><CircleHelp className="h-3.5 w-3.5 text-primary" aria-hidden="true" />Anonymous</span>
@@ -258,7 +258,7 @@ function DashboardHome() {
               </div>
             </Link>
           ))}
-          {!overview.isPending && (overview.data?.questions.length ?? 0) === 0 ? <div className="lg:col-span-3"><EmptyState icon={MessageCircle} title="The community is just getting started" description="Questions from Seedova members will appear here as the conversation grows." action={<Button asChild variant="outline"><Link to="/community">Visit community</Link></Button>} /></div> : null}
+          {!community.isPending && (community.data?.length ?? 0) === 0 ? <div className="lg:col-span-3"><EmptyState icon={MessageCircle} title="The community is just getting started" description="Questions from Seedova members will appear here as the conversation grows." action={<Button asChild variant="outline"><Link to="/community">Visit community</Link></Button>} /></div> : null}
         </div>
       </section>
 
