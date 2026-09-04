@@ -74,13 +74,18 @@ const resources = [
   { title: "How to compare fertility clinics", to: "/find-clinics" },
 ] as const;
 
+function firstNameFromValue(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const firstName = value.trim().split(/\s+/)[0];
+  return firstName || null;
+}
+
 function firstNameFromUser(user: ReturnType<typeof useAuth>["user"]): string | null {
   const metadata = user?.user_metadata;
-  const fullName = typeof metadata?.full_name === "string" ? metadata.full_name :
-    typeof metadata?.name === "string" ? metadata.name :
-    typeof metadata?.display_name === "string" ? metadata.display_name :
-    typeof metadata?.first_name === "string" ? metadata.first_name : "";
-  const firstName = fullName.trim().split(/\s+/)[0];
+  const firstName = firstNameFromValue(metadata?.full_name) ??
+    firstNameFromValue(metadata?.name) ??
+    firstNameFromValue(metadata?.display_name) ??
+    firstNameFromValue(metadata?.first_name);
   return firstName || null;
 }
 
@@ -110,7 +115,7 @@ function DashboardHome() {
     return stages.reduce((count, stage) => count + (stageNames.has(stage.toLowerCase()) ? 1 : 0), 0);
   }, [journey.data]);
   const currentStage = stages[Math.min(completedStages, stages.length - 1)];
-  const name = firstNameFromUser(user) ?? firstNameFromUser({ user_metadata: { full_name: profile.data?.displayName } } as typeof user);
+  const name = firstNameFromUser(user) ?? firstNameFromValue(profile.data?.displayName);
 
   return (
     <div className="mx-auto max-w-6xl space-y-10 pb-8 lg:space-y-12">
