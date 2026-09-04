@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { ReactNode } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -23,7 +24,6 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
 import { useAuth } from "@/lib/auth-context";
-import { getLandingOverview } from "@/lib/landing.functions";
 import { getDashboardCommunityQuestions, getMyProfile, getMySavedClinics, getMyTreatmentJourney } from "@/lib/dashboard.functions";
 import dashboardCouple from "@/assets/dashboard-couple.png";
 
@@ -272,7 +272,7 @@ function DashboardHome() {
   );
 }
 
-function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: React.ReactNode }) {
+function SectionHeading({ eyebrow, title, action }: { eyebrow?: string; title: string; action?: ReactNode }) {
   return <div className="flex items-end justify-between gap-4"><div>{eyebrow ? <p className="font-mono-plex text-[10px] uppercase tracking-[0.16em] text-primary">{eyebrow}</p> : null}<h2 className="mt-1 font-sans text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h2></div>{action}</div>;
 }
 
