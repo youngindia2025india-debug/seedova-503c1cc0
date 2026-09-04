@@ -25,7 +25,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { useAuth } from "@/lib/auth-context";
 import { getLandingOverview } from "@/lib/landing.functions";
 import { getMySavedClinics, getMyTreatmentJourney } from "@/lib/dashboard.functions";
-import heroCouple from "@/assets/hero-couple.jpg.asset.json";
+import dashboardCouple from "@/assets/dashboard-couple.png";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   head: () => ({ meta: [{ title: "Your Seedova dashboard" }, { name: "robots", content: "noindex" }] }),
@@ -274,5 +274,5 @@ function SavedClinicCard({ clinic }: { clinic: { id: string; name: string; city:
 }
 
 function DashboardIllustration() {
-  return <div className="relative min-h-[250px] overflow-hidden bg-secondary/70 lg:min-h-[390px]"><img src={heroCouple.url} alt="A couple researching fertility care together at home" width={768} height={793} className="h-full min-h-[250px] w-full object-cover object-center lg:min-h-[390px]" /></div>;
+  return <div className="relative min-h-[250px] overflow-hidden bg-secondary/70 lg:min-h-[390px]"><img src={dashboardCouple} alt="A couple researching fertility care together at home" width={886} height={850} className="h-full min-h-[250px] w-full object-cover object-center lg:min-h-[390px]" /></div>;
 }
