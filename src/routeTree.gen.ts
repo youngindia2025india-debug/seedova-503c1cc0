@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FindClinicsRouteImport } from './routes/find-clinics'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as ClinicsRouteImport } from './routes/clinics'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -71,6 +72,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const FindClinicsRoute = FindClinicsRouteImport.update({
   id: '/find-clinics',
   path: '/find-clinics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityRoute = CommunityRouteImport.update({
@@ -191,6 +197,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/clinics': typeof ClinicsRouteWithChildren
   '/community': typeof CommunityRoute
+  '/contact': typeof ContactRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/legal': typeof LegalRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/clinics': typeof ClinicsRouteWithChildren
   '/community': typeof CommunityRoute
+  '/contact': typeof ContactRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/legal': typeof LegalRoute
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/clinics': typeof ClinicsRouteWithChildren
   '/community': typeof CommunityRoute
+  '/contact': typeof ContactRoute
   '/find-clinics': typeof FindClinicsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/legal': typeof LegalRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/clinics'
     | '/community'
+    | '/contact'
     | '/find-clinics'
     | '/forgot-password'
     | '/legal'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/clinics'
     | '/community'
+    | '/contact'
     | '/find-clinics'
     | '/forgot-password'
     | '/legal'
@@ -339,6 +350,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/clinics'
     | '/community'
+    | '/contact'
     | '/find-clinics'
     | '/forgot-password'
     | '/legal'
@@ -370,6 +382,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ClinicsRoute: typeof ClinicsRouteWithChildren
   CommunityRoute: typeof CommunityRoute
+  ContactRoute: typeof ContactRoute
   FindClinicsRoute: typeof FindClinicsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LegalRoute: typeof LegalRoute
@@ -428,6 +441,13 @@ declare module '@tanstack/react-router' {
       path: '/find-clinics'
       fullPath: '/find-clinics'
       preLoaderRoute: typeof FindClinicsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community': {
@@ -647,6 +667,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ClinicsRoute: ClinicsRouteWithChildren,
   CommunityRoute: CommunityRoute,
+  ContactRoute: ContactRoute,
   FindClinicsRoute: FindClinicsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LegalRoute: LegalRoute,
