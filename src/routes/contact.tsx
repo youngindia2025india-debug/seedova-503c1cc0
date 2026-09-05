@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, type ReactNode, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowRight,
@@ -143,9 +143,9 @@ function ContactPage() {
               </fieldset>
 
               <label className="flex cursor-pointer items-start gap-3 text-sm leading-5 text-muted-foreground">
-                <input required type="checkbox" name="consent" className="peer sr-only" />
+                <input required type="checkbox" name="consent" aria-label="Consent to contact" className="peer sr-only" />
                 <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded border border-muted-foreground/70 bg-card text-primary-foreground peer-checked:border-primary peer-checked:bg-primary">
-                  <Check className="h-3.5 w-3.5 opacity-0 peer-checked:opacity-100" aria-hidden />
+                  <Check className="h-3.5 w-3.5" aria-hidden />
                 </span>
                 I agree to be contacted by Seedova regarding my enquiry.
               </label>
@@ -208,7 +208,7 @@ function ContactPage() {
   );
 }
 
-function Field({ label, required, icon: Icon, alignTop = false, children }: { label: string; required?: boolean; icon?: typeof UserRound; alignTop?: boolean; children: React.ReactNode }) {
+function Field({ label, required, icon: Icon, alignTop = false, children }: { label: string; required?: boolean; icon?: typeof UserRound; alignTop?: boolean; children: ReactNode }) {
   return (
     <label className="block">
       <span className="mb-1.5 block text-sm font-semibold text-foreground">
